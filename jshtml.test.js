@@ -1,7 +1,88 @@
 import jshtml from "./jshtml.js";
 import { assertEquals, assertThrows } from "@std/assert";
 
-const { attrsToStr, escapeForHtml } = jshtml;
+const { renderToHtml, escapeForHtml, attrsToStr } = jshtml;
+
+Deno.test(`${renderToHtml.name} - renders empty elements`, () => {
+  assertEquals(renderToHtml(null), "");
+  assertEquals(renderToHtml(false), "");
+  assertEquals(renderToHtml(undefined), "");
+  assertEquals(renderToHtml(""), "");
+});
+
+Deno.test(`${renderToHtml.name} - renders strings with proper escaping`, () => {
+  const input = "Tom & Jerry's < 'quotes' >";
+  const expected = "Tom &amp; Jerry&#39;s &lt; &#39;quotes&#39; &gt;";
+  assertEquals(renderToHtml(input), expected);
+});
+
+Deno.test(`${renderToHtml.name} - renders other primitive types as strings`, () => {
+  assertEquals(renderToHtml(23), "23");
+  assertEquals(renderToHtml(true), "true");
+  assertEquals(renderToHtml(123n), "123");
+});
+
+Deno.test(`${renderToHtml.name} - renders a void HTML tag without attributes`, () => {
+  const input = ["img"];
+  const expected = "<img>";
+  assertEquals(renderToHtml(input), expected);
+});
+
+Deno.test(`${renderToHtml.name} - renders a void HTML tag with attributes`, () => {
+  const input = [`img`, { src: "https://example.com/image.jpg", alt: 'An "image"', loading: "lazy" }];
+  const expected = '<img src="https://example.com/image.jpg" alt="An &quot;image&quot;" loading="lazy">';
+  assertEquals(renderToHtml(input), expected);
+});
+
+Deno.test(`${renderToHtml.name} - renders an HTML element without children or attributes`, () => {
+  const input = [`div`];
+  const expected = "<div></div>";
+  assertEquals(renderToHtml(input), expected);
+});
+
+Deno.test(`${renderToHtml.name} - renders an HTML tag with attributes only`, () => {
+  const input = [`div`, { class: "container", style: "margin-top:10px;" }];
+  const expected = '<div class="container" style="margin-top:10px;"></div>';
+  assertEquals(renderToHtml(input), expected);
+});
+
+Deno.test(`${renderToHtml.name} - renders an HTML tag with children only`, () => {
+  const input = [`div`, "Hello, ", null, [`strong`, "world"], "!"];
+  const expected = "<div>Hello, <strong>world</strong>!</div>";
+  assertEquals(renderToHtml(input), expected);
+});
+
+Deno.test(`${renderToHtml.name} - renders an HTML tag with attributes and children`, () => {
+  const input = [
+    `div`,
+    { class: "container", style: "margin-top:10px;" },
+    "Hello <>, ",
+    null,
+    [`strong`, "world"],
+    "!",
+  ];
+  const expected = '<div class="container" style="margin-top:10px;">Hello &lt;&gt;, <strong>world</strong>!</div>';
+  assertEquals(renderToHtml(input), expected);
+});
+
+Deno.test(`${renderToHtml.name} - renders a function component`, () => {
+  function Greeting({ name }) {
+    return [`strong`, "Hello, ", name, "!"];
+  }
+  const input = [Greeting, { name: "JSX" }];
+  const expected = "<strong>Hello, JSX!</strong>";
+  assertEquals(renderToHtml(input), expected);
+});
+
+Deno.test("renders a list of elements starting with []", () => {
+  const input = [
+    [],
+    [`h1`, "Hello, ", [`strong`, "world"], "!"],
+    [`div`, { class: "main" }, "Goodbye, ", [`strong`, "world"], "!"],
+  ];
+  const expected = '<h1>Hello, <strong>world</strong>!</h1><div class="main">Goodbye, <strong>world</strong>!</div>';
+  assertEquals(renderToHtml(input), expected);
+});
 
 Deno.test(`${escapeForHtml.name} - escapes &, <, >, \", and '`, () => {
   const input = 'Tom & Jerry\'s < "quotes" >';
