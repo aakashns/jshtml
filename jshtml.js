@@ -13,6 +13,10 @@ const jshtml = {
    * - [ ] Remove usage of `Array.includes`
    * - [ ] Add error test cases
    * - [ ] Test error feedback quality in various scenairos
+   * - [ ] Add module level docs
+   * - [ ] Add a configuration to turn off asserts
+   * - [ ] Add a renderToDom function (is it really needed?)
+   * - [ ] Include links to HTML spec where it's relevant
    *
    * @param element
    */
@@ -27,27 +31,50 @@ const jshtml = {
     // Other Primitive Types
     if (elType === "number" || elType === "boolean" || elType === "bigint") return element.toString();
 
-    // HTML Tag or Function
+    // Array
     const { tag, props, children } = jshtml._destructure(element);
     if (typeof tag === "string") {
-      const attrsStr = jshtml.attrsToStr(props);
+      // HTML tag
+      jshtml._assert(jshtml._isValidTag(tag), `Invalid tag name: ${tag}`);
+      const { rawHtml, ...attrs } = props;
+      const attrsStr = jshtml.attrsToStr(attrs);
+
       if (jshtml.VOID_TAGS.includes(tag)) {
+        // Void Tag
         if (children.length > 0) throw Error("Void tag cannot have children");
+        if (rawHtml) throw Error("Void tags can't have a 'rawHtml' prop");
         return `<${tag}${attrsStr}>`;
-      } else {
-        const prefix = tag === "html" ? "<!doctype html>" : "";
-        const childrenStr = children.map(jshtml.renderToHtml).join("");
-        return `${prefix}<${tag}${attrsStr}>${childrenStr}</${tag}>`;
       }
+
+      if (rawHtml) {
+        // Raw HTML (not escaped)
+        if (children.length > 0) throw Error("'rawHtml' and children can't be present together");
+        return `<${tag}${attrsStr}>${rawHtml}</${tag}>`;
+      }
+
+      // Normal tag with children
+      const childrenStr = children.map(jshtml.renderToHtml).join("");
+      return `<${tag}${attrsStr}>${childrenStr}</${tag}>`;
     } else if (typeof tag === "function") {
+      // Function component
       return jshtml.renderToHtml(tag(props, ...children));
     } else if (Array.isArray(tag) && tag.length === 0) {
+      // List of elements
       return children.map(jshtml.renderToHtml).join("");
     }
     assert(false, "'element[0]' must be a string, function, or []");
   },
 
-  /* Create a serializable JSON representation from an element */
+  /**
+   * Create a serializable JSON representation from an element
+   *
+   * TODO:
+   * - [ ] Test functionality
+   * - [ ] Add more assetions (?)
+   * - [ ] Add result key assertions in destructure (?)
+   *
+   * @param element
+   */
   renderToJson(element) {
     if (!Array.isArray(element)) return element;
     const { tag, props, children } = jshtml._destructure(element);
@@ -110,6 +137,12 @@ const jshtml = {
     // deno-lint-ignore no-control-regex
     const illegalChars = /[ "'>\/= \u0000-\u001F\uFDD0-\uFDEF\uFFFF\uFFFE]/;
     return !illegalChars.test(name);
+  },
+
+  /* Checks if a tag name is valid according to the HTML spec */
+  _isValidTag(name) {
+    const regex = /^[a-zA-Z_:][a-zA-Z0-9\-_:.]*$/;
+    return regex.test(name);
   },
 
   _isObject(val) {

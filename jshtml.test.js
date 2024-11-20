@@ -74,13 +74,19 @@ Deno.test(`${renderToHtml.name} - renders a function component`, () => {
   assertEquals(renderToHtml(input), expected);
 });
 
-Deno.test("renders a list of elements starting with []", () => {
+Deno.test(`${renderToHtml.name} - renders a list of elements starting with []`, () => {
   const input = [
     [],
     [`h1`, "Hello, ", [`strong`, "world"], "!"],
     [`div`, { class: "main" }, "Goodbye, ", [`strong`, "world"], "!"],
   ];
   const expected = '<h1>Hello, <strong>world</strong>!</h1><div class="main">Goodbye, <strong>world</strong>!</div>';
+  assertEquals(renderToHtml(input), expected);
+});
+
+Deno.test(`${renderToHtml.name} - renders unsanitized HTML with 'rawHtml' prop`, () => {
+  const input = [`div`, { class: "container", rawHtml: "<script>alert('XSS')</script>" }];
+  const expected = "<div class=\"container\"><script>alert('XSS')</script></div>";
   assertEquals(renderToHtml(input), expected);
 });
 
