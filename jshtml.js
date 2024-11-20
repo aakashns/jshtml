@@ -1,11 +1,18 @@
+import { assert } from "@std/assert/assert";
+
 const jshtml = {
   /**
    * TODO:
    * - [ ] Add assertions for output (each step)
+   * - [ ] Add assertions in intermediate steps
    * - [ ] Add support for `rawHtml` (& ensure no children)
    * - [ ] Add check for no children in void tag
    * - [ ] Add check for no props in fragment
-   * - [ ] Add documentation
+   * - [ ] Add documentation (and examples?)
+   * - [ ] Validate HTML tag names
+   * - [ ] Remove usage of `Array.includes`
+   * - [ ] Add error test cases
+   * - [ ] Test error feedback quality in various scenairos
    *
    * @param element
    */
@@ -21,17 +28,7 @@ const jshtml = {
     if (elType === "number" || elType === "boolean" || elType === "bigint") return element.toString();
 
     // HTML Tag or Function
-    if (!Array.isArray(element)) throw Error("'element' must be an array");
-    const tag = element[0];
-    let props, children;
-    if (jshtml._isObject(element[1])) {
-      props = element[1];
-      children = element.slice(2);
-    } else {
-      props = {};
-      children = element.slice(1);
-    }
-
+    const { tag, props, children } = jshtml._destructure(element);
     if (typeof tag === "string") {
       const attrsStr = jshtml.attrsToStr(props);
       if (jshtml.VOID_TAGS.includes(tag)) {
@@ -47,8 +44,31 @@ const jshtml = {
     } else if (Array.isArray(tag) && tag.length === 0) {
       return children.map(jshtml.renderToHtml).join("");
     }
+    assert(false, "'element[0]' must be a string, function, or []");
+  },
 
-    throw Error("'element[0]' must be a string, function, or []");
+  /* Create a serializable JSON representation from an element */
+  renderToJson(element) {
+    if (!Array.isArray(element)) return element;
+    const { tag, props, children } = jshtml._destructure(element);
+    if (typeof tag === "string") {
+      return [tag, props, ...children.map(this.renderToJson)];
+    } else if (typeof tag === "function") {
+      return this.renderToJson(tag(props, ...children));
+    } else if (Array.isArray(tag) && tag.length === 0) {
+      return element;
+    }
+    assert(false, "'element[0]' must be a string, function, or []");
+  },
+
+  /* Destructure an element into tag, props, and children */
+  _destructure(element) {
+    jshtml._assert(Array.isArray(element) && element.length > 0, "'element' must be a non-empty array");
+    const result = jshtml._isObject(element[1])
+      ? { tag: element[0], props: element[1], children: element.slice(2) }
+      : { tag: element[0], props: {}, children: element.slice(1) };
+    jshtml._assert(jshtml._isObject(result), "'result' must be an object");
+    return result;
   },
 
   /**
