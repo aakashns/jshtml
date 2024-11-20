@@ -71,6 +71,31 @@ console.log(renderToHtml(input) == expected); // true
 You can also use `jshtml.renderToJson` to convert a tree of JSX elements into serializable JSON that can be sent safely
 across the wire. The output of `renderToJson` can be passed to `renderToHtml` to generate HTML.
 
+## Custom Components
+
+You can define custom `jshtml` components using pure functions:
+
+```javascript
+function Greeting({ name }, ...children) {
+  return [`h1`, "Hello, ", name, "!"];
+}
+```
+
+And use them as follows:
+
+```javascript
+function App() {
+  return [
+    `div`,
+    [Greeting, { name: "World" }],
+    [`p`, "Welcome to JSX"],
+  ];
+}
+```
+
+**NOTE**: There's no support for state, hooks, lifecycle methods, class components etc. since `jshtml` is primarly
+intended for creating HTML strings.
+
 ## Installation
 
 To use `jshtml`, just copy the contents of `jshtml.js` into your project.
