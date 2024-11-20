@@ -1,11 +1,9 @@
 # jshtml
 
-Programmatically build HTML with pure JavaScript arrays and objects.
+_Build HTML with pure JavaScript arrays and objects_
 
-`jshtml` can be considered a replacement for JSX for building HTML programatically on a sever or in the browser without
-a transpilation step.
-
-Here's a comparison of JSX vs `jshtml`:
+`jshtml` can be considered a replacement for [JSX](https://facebook.github.io/jsx/) for building HTML programatically on
+a sever or in the browser without a transpilation step. Here's a comparison of JSX vs `jshtml`:
 
 ```javascript
 // With JSX
@@ -52,6 +50,8 @@ function Greeting({ name }) {
 }
 ```
 
+## Rendering to HTML
+
 The main function `jshtml` exports is `renderToHtml`, which turns a tree of JSX elements into a valid spec-compliant
 HTML string:
 
@@ -68,7 +68,12 @@ const expected = '<div class="container" style="margin-top:10px;">Hello &lt;&gt;
 console.log(renderToHtml(input) == expected); // true
 ```
 
-To use it, just copy the contents of `jshtml.js` into your project.
+You can also use `jshtml.renderToJson` to convert a tree of JSX elements into serializable JSON that can be sent safely
+across the wire. The output of `renderToJson` can be passed to `renderToHtml` to generate HTML.
+
+## Installation
+
+To use `jshtml`, just copy the contents of `jshtml.js` into your project.
 
 `jshtml` is currently under active development and a stable version will eventually be published to pacakge registries
 NPM and JSR.
