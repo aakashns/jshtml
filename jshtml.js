@@ -66,7 +66,6 @@ const jshtml = {
    * @param element - The JSHTML element to be rendered as HTML
    * @returns - A JSON-serializable representation of the element
    */
-
   renderToJson(element) {
     const elType = typeof element;
     const rawTypes = ["string", "number", "bigint", "boolean", "undefined"];

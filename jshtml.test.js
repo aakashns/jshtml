@@ -129,7 +129,15 @@ Deno.test(`${renderToHtml.name} - throws error for invalid fragment props`, () =
 
 Deno.test(`${renderToHtml.name} - throws error for invalid tag in array`, () => {
   const input = [{}, {}, "Invalid tag"];
-  assertThrows(() => renderToHtml(input), "'element[0]' must be a string, function, or []");
+  assertThrows(() => renderToHtml(input), "'element[0] must be a string, function, or []");
+});
+
+Deno.test(`${renderToHtml.name} - throws error if children are included twice for a function component`, () => {
+  function Greeting({ name, children }) {
+    return [`div`, [`strong`, "Hello, ", name, "!"], ...children];
+  }
+  const input = [Greeting, { name: "JSX", children: "Hello, world" }, [`span`, "Hello, world"]];
+  assertThrows(() => renderToHtml(input), Error, "Include children within or after 'props' but not both");
 });
 
 const { renderToJson } = jshtml;
@@ -165,6 +173,14 @@ Deno.test(`${renderToJson.name} - returns a fragment as-is`, () => {
 Deno.test(`${renderToJson.name} - throws error for invalid tag in array`, () => {
   const input = [{}, {}, "Invalid tag"];
   assertThrows(() => renderToJson(input), "'element[0]' must be a string, function, or []");
+});
+
+Deno.test(`${renderToJson.name} - throws error if children are included twice for a function component`, () => {
+  function Greeting({ name, children }) {
+    return [`div`, [`strong`, "Hello, ", name, "!"], ...children];
+  }
+  const input = [Greeting, { name: "JSX", children: "Hello, world" }, [`span`, "Hello, world"]];
+  assertThrows(() => renderToJson(input), Error, "Insclude children within or after 'props' but not both");
 });
 
 const { escapeForHtml } = jshtml;
