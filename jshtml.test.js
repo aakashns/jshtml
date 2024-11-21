@@ -141,3 +141,85 @@ Deno.test(`${attrsToStr.name} - throws for illegal attribute names`, () => {
   const msg = "Illegal attribute name: illegal-attr";
   assertThrows(() => attrsToStr(input), msg);
 });
+
+const { isValidAttr } = jshtml;
+
+Deno.test(`${isValidAttr.name} - returns false for the empty string`, () => {
+  assertEquals(isValidAttr(""), false);
+});
+
+Deno.test(`${isValidAttr.name} - returns true for a valid attribute name`, () => {
+  assertEquals(isValidAttr("data-id"), true);
+  assertEquals(isValidAttr("class"), true);
+  assertEquals(isValidAttr("aria-label"), true);
+});
+
+Deno.test(`${isValidAttr.name} - returns false for invalid characters`, () => {
+  assertEquals(isValidAttr("data id"), false); // space
+  assertEquals(isValidAttr("data<id"), false); // `<`
+  assertEquals(isValidAttr('data"id'), false); // `"`
+  assertEquals(isValidAttr("data'id"), false); // `'`
+  assertEquals(isValidAttr("data=id"), false); // `=`
+  assertEquals(isValidAttr("data/id"), false); // `/`
+  assertEquals(isValidAttr("data\\id"), false); // `\`
+});
+
+Deno.test(`${isValidAttr.name} - returns false for control characters`, () => {
+  assertEquals(isValidAttr("data\u0000id"), false); // Null character
+  assertEquals(isValidAttr("data\u001Fid"), false); // Unit Separator
+});
+
+Deno.test(`${isValidAttr.name} - returns false for noncharacters`, () => {
+  assertEquals(isValidAttr("data\uFDD0id"), false); // Noncharacter U+FDD0
+  assertEquals(isValidAttr("data\uFFFEid"), false); // Noncharacter U+FFFE
+  assertEquals(isValidAttr("data\uFFFFid"), false); // Noncharacter U+FFFF
+});
+
+Deno.test(`${isValidAttr.name} - throws for non-string input`, () => {
+  assertThrows(() => isValidAttr(123), "'name' must be a string");
+  assertThrows(() => isValidAttr({}), "'name' must be a string");
+  assertThrows(() => isValidAttr(null), "'name' must be a string");
+  assertThrows(() => isValidAttr(undefined), "'name' must be a string");
+});
+
+const { isValidTag } = jshtml;
+
+Deno.test(`${isValidTag.name} - returns false for invalid tag names`, () => {
+  assertEquals(isValidTag(""), false);
+  assertEquals(isValidTag("123"), false); // Starts with a number
+  assertEquals(isValidTag("-tag"), false); // Starts with a hyphen
+  assertEquals(isValidTag("ta@ag"), false); // Contains invalid character
+});
+
+Deno.test(`${isValidTag.name} - returns true for valid HTML tag names`, () => {
+  assertEquals(isValidTag("div"), true);
+  assertEquals(isValidTag("p"), true);
+  assertEquals(isValidTag("span"), true);
+  assertEquals(isValidTag("h1"), true);
+});
+
+Deno.test(`${isValidTag.name} - returns false for invalid custom element names`, () => {
+  assertEquals(isValidTag("-custom-element"), false); // Starts with hyphen
+  assertEquals(isValidTag("custom..element"), false); // Double periods
+});
+
+Deno.test(`${isValidTag.name} - returns true for valid custom element names`, () => {
+  assertEquals(isValidTag("custom-element"), true);
+  assertEquals(isValidTag("my-widget"), true);
+  assertEquals(isValidTag("app-container"), true);
+  assertEquals(isValidTag("x-tag"), true);
+  assertEquals(isValidTag("my-custom-element"), true); // multiple hyphens
+  assertEquals(isValidTag("custom-element-"), true); // ends with hyphen
+  assertEquals(isValidTag("widget-🌟"), false); // Emoji
+});
+
+Deno.test(`${isValidTag.name} - supports Unicode characters for custom elements`, () => {
+  assertEquals(isValidTag("x-élement"), true);
+  assertEquals(isValidTag("tag-アニメ"), true);
+});
+
+Deno.test(`${isValidTag.name} - throws an error when 'name' is not a string`, () => {
+  assertThrows(() => isValidTag(123), Error, "'name' must be a string");
+  assertThrows(() => isValidTag(null), Error, "'name' must be a string");
+  assertThrows(() => isValidTag(undefined), Error, "'name' must be a string");
+});
