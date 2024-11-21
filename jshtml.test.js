@@ -1,7 +1,7 @@
 import jshtml from "./jshtml.js";
 import { assertEquals, assertThrows } from "@std/assert";
 
-const { renderToHtml, escapeForHtml, attrsToStr } = jshtml;
+const { renderToHtml } = jshtml;
 
 Deno.test(`${renderToHtml.name} - renders empty elements`, () => {
   assertEquals(renderToHtml(null), "");
@@ -66,11 +66,11 @@ Deno.test(`${renderToHtml.name} - renders an HTML tag with attributes and childr
 });
 
 Deno.test(`${renderToHtml.name} - renders a function component`, () => {
-  function Greeting({ name }) {
-    return [`strong`, "Hello, ", name, "!"];
+  function Greeting({ name, children }) {
+    return [`div`, [`strong`, "Hello, ", name, "!"], ...children];
   }
-  const input = [Greeting, { name: "JSX" }];
-  const expected = "<strong>Hello, JSX!</strong>";
+  const input = [Greeting, { name: "JSX" }, [`span`, "Hello, world"]];
+  const expected = "<div><strong>Hello, JSX!</strong><span>Hello, world</span></div>";
   assertEquals(renderToHtml(input), expected);
 });
 
@@ -89,6 +89,45 @@ Deno.test(`${renderToHtml.name} - renders unsanitized HTML with 'rawHtml' prop`,
   const expected = "<div class=\"container\"><script>alert('XSS')</script></div>";
   assertEquals(renderToHtml(input), expected);
 });
+
+Deno.test(`${renderToHtml.name} - throws for invalid element types`, () => {
+  assertThrows(() => renderToHtml({}), "Invalid 'element'");
+  assertThrows(() => renderToHtml(Symbol("invalid")), "Invalid 'element'");
+  assertThrows(() => renderToHtml(() => {}), "Invalid 'element'");
+});
+
+Deno.test(`${renderToHtml.name} - throws error for invalid tag names`, () => {
+  assertThrows(() => renderToHtml([`invalid_tag_name!`]), "Invalid tag name: invalid_tag_name!");
+});
+
+Deno.test(`${renderToHtml.name} - throws error when void tag has children`, () => {
+  assertThrows(() => renderToHtml([`img`, {}, "Some content"]), "Void tag img can't have children");
+});
+
+Deno.test(`${renderToHtml.name} - throws error when void tag has a 'rawHtml' prop`, () => {
+  assertThrows(
+    () => renderToHtml([`img`, { rawHtml: "<script>alert('XSS')</script>" }]),
+    "Void tag img can't have a 'rawHtml' prop",
+  );
+});
+
+Deno.test(`${renderToHtml.name} - throws error when 'rawHtml' and 'children' are used together`, () => {
+  assertThrows(
+    () => renderToHtml([`div`, { rawHtml: "<span>raw</span>" }, "This is text"]),
+    Error,
+    "'rawHtml' and 'children' must not be used together",
+  );
+});
+
+Deno.test(`${renderToHtml.name} - throws error for invalid fragment props`, () => {
+  assertThrows(
+    () => renderToHtml([[], { class: "container" }]),
+    Error,
+    "Fragment [] must not have any props",
+  );
+});
+
+const { escapeForHtml } = jshtml;
 
 Deno.test(`${escapeForHtml.name} - escapes &, <, >, \", and '`, () => {
   const input = 'Tom & Jerry\'s < "quotes" >';
@@ -109,6 +148,8 @@ Deno.test(`${escapeForHtml.name} - throws for non-string input`, () => {
   assertThrows(() => escapeForHtml(undefined), Error, message);
   assertThrows(() => escapeForHtml({}), Error, message);
 });
+
+const { attrsToStr } = jshtml;
 
 Deno.test(`${attrsToStr.name} - renders empty object`, () => {
   assertEquals(attrsToStr({}), "");

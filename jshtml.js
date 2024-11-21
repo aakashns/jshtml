@@ -3,7 +3,7 @@ const jshtml = {
    * Renders a JSHTML element into a valid spec-compliant HTML string
    * Supports raw data types and well as array-based JSHTML elements
    *
-   * @param element - The JSHTML element to be rendered
+   * @param element - The JSHTML element to be rendered as HTML
    * @returns {string} - The HTML string representation of the element
    */
   renderToHtml(element) {
@@ -25,7 +25,7 @@ const jshtml = {
     const { tag, props, children } = jshtml._destructure(element);
     if (typeof tag === "string") {
       // HTML tag
-      if (!jshtml.isValidTag(tag)) return Error(`Invalid tag name: ${tag}`);
+      if (!jshtml.isValidTag(tag)) throw Error(`Invalid tag name: ${tag}`);
       const { rawHtml, ...attrs } = props;
       const attrsStr = jshtml.attrsToStr(attrs);
 
@@ -47,7 +47,7 @@ const jshtml = {
       return assertResult(`<${tag}${attrsStr}>${childrenStr}</${tag}>`);
     } else if (typeof tag === "function") {
       // Function component
-      return assertResult(jshtml.renderToHtml(tag({ ...props, children })));
+      return assertResult(jshtml.renderToHtml(tag({ children, ...props })));
     } else if (Array.isArray(tag) && tag.length === 0) {
       // List of elements
       if (Object.keys(props).length > 0) throw Error("Fragment [] must not have any props");
