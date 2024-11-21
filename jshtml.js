@@ -53,29 +53,38 @@ const jshtml = {
       if (Object.keys(props).length > 0) throw Error("Fragment [] must not have any props");
       return assertResult(children.map(jshtml.renderToHtml).join(""));
     }
+    throw Error("'element[0]' must be a string, function, or []");
   },
 
   /**
-   * Create a serializable JSON representation from an element
+   * Renders a JSHTML element into JSON-serializable format
+   * Invokes all function components with their props and children
    *
-   * TODO:
-   * - [ ] Test functionality
-   * - [ ] Add more assetions (?)
-   * - [ ] Add result key assertions in destructure (?)
-   *
-   * @param element
+   * @param element - The JSHTML element to be rendered as HTML
+   * @returns - A JSON-serializable representation of the element
    */
+
   renderToJson(element) {
-    if (!Array.isArray(element)) return element;
+    const elType = typeof element;
+    const rawTypes = ["string", "number", "bigint", "boolean", "undefined"];
+    jshtml._assert(rawTypes.indexOf(elType) !== -1 || Array.isArray(element) || element === null, "Invalid 'element'");
+    const assertResult = jshtml._makeAssert(
+      (r) => rawTypes.indexOf(typeof r) !== -1 || Array.isArray(r) || r === null,
+      "Invalid 'result'",
+    );
+
+    if (!Array.isArray(element)) return assertResult(element);
     const { tag, props, children } = jshtml._destructure(element);
     if (typeof tag === "string") {
-      return [tag, props, ...children.map(jshtml.renderToJson)];
+      const renderedChildren = children.map(jshtml.renderToJson);
+      const hasProps = Object.keys(props).length > 0;
+      return assertResult(hasProps ? [tag, props, ...renderedChildren] : [tag, ...renderedChildren]);
     } else if (typeof tag === "function") {
-      return jshtml.renderToJson(tag(props, ...children));
+      return assertResult(jshtml.renderToJson(tag({ children, ...props })));
     } else if (Array.isArray(tag) && tag.length === 0) {
-      return element;
+      return assertResult(element);
     }
-    jshtml._assert(false, "'element[0]' must be a string, function, or []");
+    throw Error("'element[0]' must be a string, function, or []");
   },
 
   /* Destructure an element into tag, props, and children */

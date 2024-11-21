@@ -127,6 +127,46 @@ Deno.test(`${renderToHtml.name} - throws error for invalid fragment props`, () =
   );
 });
 
+Deno.test(`${renderToHtml.name} - throws error for invalid tag in array`, () => {
+  const input = [{}, {}, "Invalid tag"];
+  assertThrows(() => renderToHtml(input), "'element[0]' must be a string, function, or []");
+});
+
+const { renderToJson } = jshtml;
+
+Deno.test(`${renderToJson.name} - returns element as-is if not an array`, () => {
+  assertEquals(renderToJson("text"), "text");
+  assertEquals(renderToJson(123), 123);
+  assertEquals(renderToJson(true), true);
+  assertEquals(renderToJson(null), null);
+});
+
+Deno.test(`${renderToJson.name} - converts a JSHTML element to JSON`, () => {
+  const input = [`div`, { class: "container" }, "Hello", [`span`, {}, "World"]];
+  const expected = [`div`, { class: "container" }, "Hello", ["span", "World"]];
+  assertEquals(renderToJson(input), expected);
+});
+
+Deno.test(`${renderToJson.name} - renders a function component to JSON`, () => {
+  function Greeting({ name, children = [] }) {
+    return [`div`, { class: "greeting" }, `Hello, ${name}!`, ...children];
+  }
+  const input = [Greeting, { name: "JSX" }, [`span`, "Goodbye, world"]];
+  const expected = ["div", { class: "greeting" }, "Hello, JSX!", ["span", "Goodbye, world"]];
+  assertEquals(renderToJson(input), expected);
+});
+
+Deno.test(`${renderToJson.name} - returns a fragment as-is`, () => {
+  const input = [[], "Hello", "world"];
+  const expected = [[], "Hello", "world"];
+  assertEquals(renderToJson(input), expected);
+});
+
+Deno.test(`${renderToJson.name} - throws error for invalid tag in array`, () => {
+  const input = [{}, {}, "Invalid tag"];
+  assertThrows(() => renderToJson(input), "'element[0]' must be a string, function, or []");
+});
+
 const { escapeForHtml } = jshtml;
 
 Deno.test(`${escapeForHtml.name} - escapes &, <, >, \", and '`, () => {
