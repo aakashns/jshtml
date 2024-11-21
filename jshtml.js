@@ -47,6 +47,9 @@ const jshtml = {
       return assertResult(`<${tag}${attrsStr}>${childrenStr}</${tag}>`);
     } else if (typeof tag === "function") {
       // Function component
+      if (children.length > 0 && "children" in props) {
+        throw Error("Include children within or after 'props' but not both");
+      }
       return assertResult(jshtml.renderToHtml(tag({ children, ...props })));
     } else if (Array.isArray(tag) && tag.length === 0) {
       // List of elements
@@ -80,22 +83,14 @@ const jshtml = {
       const hasProps = Object.keys(props).length > 0;
       return assertResult(hasProps ? [tag, props, ...renderedChildren] : [tag, ...renderedChildren]);
     } else if (typeof tag === "function") {
+      if (children.length > 0 && "children" in props) {
+        throw Error("Include children within or after 'props' but not both");
+      }
       return assertResult(jshtml.renderToJson(tag({ children, ...props })));
     } else if (Array.isArray(tag) && tag.length === 0) {
       return assertResult(element);
     }
     throw Error("'element[0]' must be a string, function, or []");
-  },
-
-  /* Destructure an element into tag, props, and children */
-  _destructure(element) {
-    jshtml._assert(Array.isArray(element) && element.length > 0, "'element' must be a non-empty array");
-    const assertResult = jshtml._makeAssert((r) => typeof r === "object", "result must be an object");
-
-    const result = jshtml._isObject(element[1])
-      ? { tag: element[0], props: element[1], children: element.slice(2) }
-      : { tag: element[0], props: {}, children: element.slice(1) };
-    return assertResult(result);
   },
 
   /**
@@ -169,10 +164,6 @@ const jshtml = {
     return assertResult(normalTagRegex.test(name) || customElementRegex.test(name));
   },
 
-  _isObject(val) {
-    return typeof val === "object" && val !== null && !Array.isArray(val);
-  },
-
   /* Names of void (self-closing) HTML tags e.g. <br> */
   VOID_TAGS: [
     "area",
@@ -192,6 +183,22 @@ const jshtml = {
     "track",
     "wbr",
   ],
+
+  /* Destructure an element into tag, props, and children */
+  _destructure(element) {
+    jshtml._assert(Array.isArray(element) && element.length > 0, "'element' must be a non-empty array");
+    const assertResult = jshtml._makeAssert((r) => typeof r === "object", "result must be an object");
+
+    const result = jshtml._isObject(element[1])
+      ? { tag: element[0], props: element[1], children: element.slice(2) }
+      : { tag: element[0], props: {}, children: element.slice(1) };
+    return assertResult(result);
+  },
+
+  /* Checks if a value is a non-null non-Array object */
+  _isObject(val) {
+    return typeof val === "object" && val !== null && !Array.isArray(val);
+  },
 
   /* Makes an assertion and throws if it fails */
   _assert(expr, msg = "") {
