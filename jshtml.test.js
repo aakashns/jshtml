@@ -171,6 +171,12 @@ Deno.test(`${renderToJson.name} - returns a fragment as-is`, () => {
   assertEquals(renderToJson(input), expected);
 });
 
+Deno.test(`${renderToJson.name} - throws for invalid element types`, () => {
+  assertThrows(() => renderToJson({}), Error, "Invalid 'element'");
+  assertThrows(() => renderToJson(Symbol("invalid")), Error, "Invalid 'element'");
+  assertThrows(() => renderToJson(() => {}), Error, "Invalid 'element'");
+});
+
 Deno.test(`${renderToJson.name} - throws error for invalid tag in array`, () => {
   const input = [{}, {}, "Invalid tag"];
   assertThrows(() => renderToJson(input), Error, "'element[0]' must be a string, function, or []");
