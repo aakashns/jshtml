@@ -91,22 +91,23 @@ Deno.test(`${renderToHtml.name} - renders unsanitized HTML with 'rawHtml' prop`,
 });
 
 Deno.test(`${renderToHtml.name} - throws for invalid element types`, () => {
-  assertThrows(() => renderToHtml({}), "Invalid 'element'");
-  assertThrows(() => renderToHtml(Symbol("invalid")), "Invalid 'element'");
-  assertThrows(() => renderToHtml(() => {}), "Invalid 'element'");
+  assertThrows(() => renderToHtml({}), Error, "Invalid 'element'");
+  assertThrows(() => renderToHtml(Symbol("invalid")), Error, "Invalid 'element'");
+  assertThrows(() => renderToHtml(() => {}), Error, "Invalid 'element'");
 });
 
 Deno.test(`${renderToHtml.name} - throws error for invalid tag names`, () => {
-  assertThrows(() => renderToHtml([`invalid_tag_name!`]), "Invalid tag name: invalid_tag_name!");
+  assertThrows(() => renderToHtml([`invalid_tag_name!`]), Error, "Invalid tag name: invalid_tag_name!");
 });
 
 Deno.test(`${renderToHtml.name} - throws error when void tag has children`, () => {
-  assertThrows(() => renderToHtml([`img`, {}, "Some content"]), "Void tag img can't have children");
+  assertThrows(() => renderToHtml([`img`, {}, "Some content"]), Error, "Void tag img can't have children");
 });
 
 Deno.test(`${renderToHtml.name} - throws error when void tag has a 'rawHtml' prop`, () => {
   assertThrows(
     () => renderToHtml([`img`, { rawHtml: "<script>alert('XSS')</script>" }]),
+    Error,
     "Void tag img can't have a 'rawHtml' prop",
   );
 });
@@ -129,7 +130,7 @@ Deno.test(`${renderToHtml.name} - throws error for invalid fragment props`, () =
 
 Deno.test(`${renderToHtml.name} - throws error for invalid tag in array`, () => {
   const input = [{}, {}, "Invalid tag"];
-  assertThrows(() => renderToHtml(input), "'element[0] must be a string, function, or []");
+  assertThrows(() => renderToHtml(input), Error, "'element[0]' must be a string, function, or []");
 });
 
 Deno.test(`${renderToHtml.name} - throws error if children are included twice for a function component`, () => {
@@ -172,7 +173,7 @@ Deno.test(`${renderToJson.name} - returns a fragment as-is`, () => {
 
 Deno.test(`${renderToJson.name} - throws error for invalid tag in array`, () => {
   const input = [{}, {}, "Invalid tag"];
-  assertThrows(() => renderToJson(input), "'element[0]' must be a string, function, or []");
+  assertThrows(() => renderToJson(input), Error, "'element[0]' must be a string, function, or []");
 });
 
 Deno.test(`${renderToJson.name} - throws error if children are included twice for a function component`, () => {
@@ -180,7 +181,7 @@ Deno.test(`${renderToJson.name} - throws error if children are included twice fo
     return [`div`, [`strong`, "Hello, ", name, "!"], ...children];
   }
   const input = [Greeting, { name: "JSX", children: "Hello, world" }, [`span`, "Hello, world"]];
-  assertThrows(() => renderToJson(input), Error, "Insclude children within or after 'props' but not both");
+  assertThrows(() => renderToJson(input), Error, "Include children within or after 'props' but not both");
 });
 
 const { escapeForHtml } = jshtml;
@@ -230,13 +231,13 @@ Deno.test(`${attrsToStr.name} - renders a mix of different value types`, () => {
 Deno.test(`${attrsToStr.name} - throws for non-object inputs`, () => {
   const input = "test";
   const msg = "'attrs' must be an object";
-  assertThrows(() => attrsToStr(input), msg);
+  assertThrows(() => attrsToStr(input), Error, msg);
 });
 
 Deno.test(`${attrsToStr.name} - throws for illegal attribute names`, () => {
   const input = { "illegal>attr": "value" };
-  const msg = "Illegal attribute name: illegal-attr";
-  assertThrows(() => attrsToStr(input), msg);
+  const msg = "Illegal attribute name: illegal>attr";
+  assertThrows(() => attrsToStr(input), Error, msg);
 });
 
 const { isValidAttr } = jshtml;
@@ -273,10 +274,10 @@ Deno.test(`${isValidAttr.name} - returns false for noncharacters`, () => {
 });
 
 Deno.test(`${isValidAttr.name} - throws for non-string input`, () => {
-  assertThrows(() => isValidAttr(123), "'name' must be a string");
-  assertThrows(() => isValidAttr({}), "'name' must be a string");
-  assertThrows(() => isValidAttr(null), "'name' must be a string");
-  assertThrows(() => isValidAttr(undefined), "'name' must be a string");
+  assertThrows(() => isValidAttr(123), Error, "'name' must be a string");
+  assertThrows(() => isValidAttr({}), Error, "'name' must be a string");
+  assertThrows(() => isValidAttr(null), Error, "'name' must be a string");
+  assertThrows(() => isValidAttr(undefined), Error, "'name' must be a string");
 });
 
 const { isValidTag } = jshtml;
