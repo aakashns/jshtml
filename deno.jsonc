@@ -1,6 +1,9 @@
 {
   "name": "@aakashns/jshtml",
   "exports": "./jshtml.js",
+  "tasks": {
+    "coverage": "rm -rf ./coverage && deno test --coverage && deno coverage --html"
+  },
   "lint": {
     "rules": {
       "tags": ["recommended"],

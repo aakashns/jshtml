@@ -119,8 +119,15 @@ Deno.test(`${renderToHtml.name} - throws when void tag has a 'rawHtml' prop`, ()
 });
 
 Deno.test(`${renderToHtml.name} - throws when 'rawHtml' and 'children' are used together`, () => {
+  // Normal tag
   assertThrows(
     () => renderToHtml([`div`, { rawHtml: "<span>raw</span>" }, "This is text"]),
+    Error,
+    "'rawHtml' and 'children' must not be used together",
+  );
+  // Empty tag
+  assertThrows(
+    () => renderToHtml([``, { rawHtml: "<span>raw</span>" }, "This is text"]),
     Error,
     "'rawHtml' and 'children' must not be used together",
   );

@@ -210,7 +210,7 @@ const jshtml = {
     return assertResult({ tag, props: {}, children: element.slice(1) });
   },
 
-  /* Checks if a value is a non-null non-Array object */
+  /* Checks if a value is a non-null non-array object */
   _isObject(val) {
     return typeof val === "object" && val !== null && !Array.isArray(val);
   },

@@ -1,6 +1,6 @@
 # jshtml
 
-_Build HTML with pure JavaScript arrays and objects_
+_Clean and Performant HTML in Pure JavaScript_
 
 `jshtml` can be considered a replacement for [JSX](https://facebook.github.io/jsx/) for building HTML programatically on
 a sever or in the browser without a transpilation step. Here's a comparison of JSX vs `jshtml`:
