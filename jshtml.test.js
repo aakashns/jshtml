@@ -74,9 +74,9 @@ Deno.test(`${renderToHtml.name} - renders a function component`, () => {
   assertEquals(renderToHtml(input), expected);
 });
 
-Deno.test(`${renderToHtml.name} - renders a list of elements starting with []`, () => {
+Deno.test(`${renderToHtml.name} - renders a list of elements starting with \`\``, () => {
   const input = [
-    [],
+    ``,
     [`h1`, "Hello, ", [`strong`, "world"], "!"],
     [`div`, { class: "main" }, "Goodbye, ", [`strong`, "world"], "!"],
   ];
@@ -85,9 +85,15 @@ Deno.test(`${renderToHtml.name} - renders a list of elements starting with []`, 
 });
 
 Deno.test(`${renderToHtml.name} - renders unsanitized HTML with 'rawHtml' prop`, () => {
+  // Normal tag
   const input = [`div`, { class: "container", rawHtml: "<script>alert('XSS')</script>" }];
   const expected = "<div class=\"container\"><script>alert('XSS')</script></div>";
   assertEquals(renderToHtml(input), expected);
+
+  // Empty tag
+  const input2 = [``, { rawHtml: "<script>alert('XSS')</script>" }];
+  const expected2 = "<script>alert('XSS')</script>";
+  assertEquals(renderToHtml(input2), expected2);
 });
 
 Deno.test(`${renderToHtml.name} - throws for invalid element types`, () => {
@@ -96,15 +102,15 @@ Deno.test(`${renderToHtml.name} - throws for invalid element types`, () => {
   assertThrows(() => renderToHtml(() => {}), Error, "Invalid 'element'");
 });
 
-Deno.test(`${renderToHtml.name} - throws error for invalid tag names`, () => {
+Deno.test(`${renderToHtml.name} - throws for invalid tag names`, () => {
   assertThrows(() => renderToHtml([`invalid_tag_name!`]), Error, "Invalid tag name: invalid_tag_name!");
 });
 
-Deno.test(`${renderToHtml.name} - throws error when void tag has children`, () => {
+Deno.test(`${renderToHtml.name} - throws when void tag has children`, () => {
   assertThrows(() => renderToHtml([`img`, {}, "Some content"]), Error, "Void tag img can't have children");
 });
 
-Deno.test(`${renderToHtml.name} - throws error when void tag has a 'rawHtml' prop`, () => {
+Deno.test(`${renderToHtml.name} - throws when void tag has a 'rawHtml' prop`, () => {
   assertThrows(
     () => renderToHtml([`img`, { rawHtml: "<script>alert('XSS')</script>" }]),
     Error,
@@ -112,7 +118,7 @@ Deno.test(`${renderToHtml.name} - throws error when void tag has a 'rawHtml' pro
   );
 });
 
-Deno.test(`${renderToHtml.name} - throws error when 'rawHtml' and 'children' are used together`, () => {
+Deno.test(`${renderToHtml.name} - throws when 'rawHtml' and 'children' are used together`, () => {
   assertThrows(
     () => renderToHtml([`div`, { rawHtml: "<span>raw</span>" }, "This is text"]),
     Error,
@@ -120,20 +126,25 @@ Deno.test(`${renderToHtml.name} - throws error when 'rawHtml' and 'children' are
   );
 });
 
-Deno.test(`${renderToHtml.name} - throws error for invalid fragment props`, () => {
+Deno.test(`${renderToHtml.name} - throws if 'rawHtml' is not a string`, () => {
+  assertThrows(() => renderToHtml([`div`, { rawHtml: 23 }]), Error, "'rawHtml' must be a string");
+  assertThrows(() => renderToHtml([``, { rawHtml: 23 }]), Error, "'rawHtml' must be a string");
+});
+
+Deno.test(`${renderToHtml.name} - throws for invalid props for empty tag`, () => {
   assertThrows(
-    () => renderToHtml([[], { class: "container" }]),
+    () => renderToHtml([``, { class: "container" }]),
     Error,
-    "Fragment [] must not have any props",
+    "Empty tag `` must not have props other than 'rawHtml'",
   );
 });
 
-Deno.test(`${renderToHtml.name} - throws error for invalid tag in array`, () => {
+Deno.test(`${renderToHtml.name} - throws for invalid tag in array`, () => {
   const input = [{}, {}, "Invalid tag"];
-  assertThrows(() => renderToHtml(input), Error, "'element[0]' must be a string, function, or []");
+  assertThrows(() => renderToHtml(input), Error, "'element[0]' must be a string or a function");
 });
 
-Deno.test(`${renderToHtml.name} - throws error if children are included twice for a function component`, () => {
+Deno.test(`${renderToHtml.name} - throws if children are included twice for a function component`, () => {
   function Greeting({ name, children }) {
     return [`div`, [`strong`, "Hello, ", name, "!"], ...children];
   }
@@ -165,9 +176,9 @@ Deno.test(`${renderToJson.name} - renders a function component to JSON`, () => {
   assertEquals(renderToJson(input), expected);
 });
 
-Deno.test(`${renderToJson.name} - returns a fragment as-is`, () => {
-  const input = [[], "Hello", "world"];
-  const expected = [[], "Hello", "world"];
+Deno.test(`${renderToJson.name} - returns an array with empty tag \`\` as-is`, () => {
+  const input = [``, "Hello", "world"];
+  const expected = [``, "Hello", "world"];
   assertEquals(renderToJson(input), expected);
 });
 
@@ -177,12 +188,12 @@ Deno.test(`${renderToJson.name} - throws for invalid element types`, () => {
   assertThrows(() => renderToJson(() => {}), Error, "Invalid 'element'");
 });
 
-Deno.test(`${renderToJson.name} - throws error for invalid tag in array`, () => {
+Deno.test(`${renderToJson.name} - throws for invalid tag in array`, () => {
   const input = [{}, {}, "Invalid tag"];
-  assertThrows(() => renderToJson(input), Error, "'element[0]' must be a string, function, or []");
+  assertThrows(() => renderToJson(input), Error, "'element[0]' must be a string or a function");
 });
 
-Deno.test(`${renderToJson.name} - throws error if children are included twice for a function component`, () => {
+Deno.test(`${renderToJson.name} - throws if children are included twice for a function component`, () => {
   function Greeting({ name, children }) {
     return [`div`, [`strong`, "Hello, ", name, "!"], ...children];
   }

@@ -18,26 +18,42 @@ const jshtml = {
     // Text
     if (elType === "string") return assertResult(jshtml.escapeForHtml(element));
 
-    // Other Primitive Types
+    // Other primitive types
     if (elType === "number" || elType === "boolean" || elType === "bigint") return assertResult(element.toString());
 
     // Array
-    const { tag, props, children } = jshtml._destructure(element);
-    if (typeof tag === "string") {
+    const { tag, props, children } = jshtml.destructure(element);
+    // Empty tag
+    if (tag === ``) {
+      const { rawHtml, ...attrs } = props;
+      if (Object.keys(attrs).length > 0) throw Error("Empty tag `` must not have props other than 'rawHtml'");
+
+      // Raw HTML (not escaped)
+      if (rawHtml) {
+        if (typeof rawHtml !== "string") throw Error("'rawHtml' must be a string");
+        if (children.length > 0) throw Error("'rawHtml' and 'children' must not be used together");
+        return assertResult(rawHtml);
+      }
+
+      // List of elements
+      return assertResult(children.map(jshtml.renderToHtml).join(""));
+
       // HTML tag
+    } else if (typeof tag === "string") {
       if (!jshtml.isValidTag(tag)) throw Error(`Invalid tag name: ${tag}`);
       const { rawHtml, ...attrs } = props;
       const attrsStr = jshtml.attrsToStr(attrs);
 
+      // Void Tag
       if (jshtml.VOID_TAGS.indexOf(tag) !== -1) {
-        // Void Tag
         if (children.length > 0) throw Error(`Void tag ${tag} can't have children`);
         if (rawHtml) throw Error(`Void tag ${tag} can't have a 'rawHtml' prop`);
         return assertResult(`<${tag}${attrsStr}>`);
       }
 
+      // Normal tag with raw HTML (not escaped)
       if (rawHtml) {
-        // Raw HTML (not escaped)
+        if (typeof rawHtml !== "string") throw Error("'rawHtml' must be a string");
         if (children.length > 0) throw Error("'rawHtml' and 'children' must not be used together");
         return assertResult(`<${tag}${attrsStr}>${rawHtml}</${tag}>`);
       }
@@ -45,18 +61,14 @@ const jshtml = {
       // Normal tag with children
       const childrenStr = children.map(jshtml.renderToHtml).join("");
       return assertResult(`<${tag}${attrsStr}>${childrenStr}</${tag}>`);
-    } else if (typeof tag === "function") {
+
       // Function component
-      if (children.length > 0 && "children" in props) {
-        throw Error("Include children within or after 'props' but not both");
-      }
+    } else if (typeof tag === "function") {
       return assertResult(jshtml.renderToHtml(tag({ children, ...props })));
-    } else if (Array.isArray(tag) && tag.length === 0) {
-      // List of elements
-      if (Object.keys(props).length > 0) throw Error("Fragment [] must not have any props");
-      return assertResult(children.map(jshtml.renderToHtml).join(""));
     }
-    throw Error("'element[0]' must be a string, function, or []");
+
+    // Invalid element
+    throw Error("'element[0]' must be a string or a function");
   },
 
   /**
@@ -76,20 +88,15 @@ const jshtml = {
     );
 
     if (!Array.isArray(element)) return assertResult(element);
-    const { tag, props, children } = jshtml._destructure(element);
+    const { tag, props, children } = jshtml.destructure(element);
     if (typeof tag === "string") {
       const renderedChildren = children.map(jshtml.renderToJson);
       const hasProps = Object.keys(props).length > 0;
       return assertResult(hasProps ? [tag, props, ...renderedChildren] : [tag, ...renderedChildren]);
     } else if (typeof tag === "function") {
-      if (children.length > 0 && "children" in props) {
-        throw Error("Include children within or after 'props' but not both");
-      }
       return assertResult(jshtml.renderToJson(tag({ children, ...props })));
-    } else if (Array.isArray(tag) && tag.length === 0) {
-      return assertResult(element);
     }
-    throw Error("'element[0]' must be a string, function, or []");
+    throw Error("'element[0]' must be a string or a function");
   },
 
   /**
@@ -184,14 +191,23 @@ const jshtml = {
   ],
 
   /* Destructure an element into tag, props, and children */
-  _destructure(element) {
+  destructure(element) {
     jshtml._assert(Array.isArray(element) && element.length > 0, "'element' must be a non-empty array");
     const assertResult = jshtml._makeAssert((r) => typeof r === "object", "result must be an object");
 
-    const result = jshtml._isObject(element[1])
-      ? { tag: element[0], props: element[1], children: element.slice(2) }
-      : { tag: element[0], props: {}, children: element.slice(1) };
-    return assertResult(result);
+    const tag = element[0];
+    // Props present
+    if (jshtml._isObject(element[1])) {
+      const props = element[1];
+      if ("children" in props && element.length > 2) {
+        throw Error("Include children within or after 'props' but not both");
+      }
+      const children = "children" in props ? props.children : element.slice(2);
+      if (!Array.isArray(children)) throw Error("'children' must be an array of elements");
+      return assertResult({ tag, props, children });
+    }
+    // Props absent
+    return assertResult({ tag, props: {}, children: element.slice(1) });
   },
 
   /* Checks if a value is a non-null non-Array object */
