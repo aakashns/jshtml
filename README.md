@@ -49,7 +49,7 @@ const html = jshtml.renderToHtml([App]);
 console.log(html);
 ```
 
-This will output clean, spec-compliant HTML (without the spaces or indentation):
+This will output clean, spec-compliant HTML (without any spaces or indentation):
 
 ```html
 <html>
@@ -94,7 +94,7 @@ Construct `jshtml` elements using arrays and functions as shown below, and rende
 
 ### HTML Tags
 
-HTML elements are represented as arrays where the first element is the tag name as a string:
+HTML elements are represented as arrays where the first element is a string representing the tag name:
 
 ```javascript
 // Basic elements
@@ -121,7 +121,7 @@ const element4 = [
 
 ### Attributes (Props)
 
-Attributes can be specified (optionally) as an object in the second position of the array:
+Attributes (also referred to as "props") can be optionally specified as an object in the second position of the array:
 
 ```javascript
 const element = [
@@ -136,11 +136,11 @@ const element = [
 ];
 ```
 
-Special cases for rendering HTML:
+Non-string values are handled as follows while rendering:
 
 - Boolean attributes (like `disabled`) will be included if set to true `true`, and omitted if `false`
 - Attributes with `null` and `undefined` values are omitted
-- Values are automatically converted to strings and properly escaped
+- Other values are automatically converted to strings and properly escaped
 
 ### Children
 
