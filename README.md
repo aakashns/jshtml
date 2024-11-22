@@ -46,13 +46,9 @@ function Footer({ children }) {
 // Render to a spec-compliant HTML string
 const html = jshtml.renderToHtml([App]);
 console.log(html);
-
-// Render to a serializable JSON representation
-const json = jshtml.renderToJson([App]);
-console.log(json);
 ```
 
-This will output clean, spec-compliant HTML:
+This will output clean, spec-compliant HTML (wihtout spaces or indentation):
 
 ```html
 <html>
@@ -73,6 +69,7 @@ This will output clean, spec-compliant HTML:
     </main>
     <footer>
       <p>© 2024 JSHTML</p>
+      <p>Visit our website for more.</p>
     </footer>
   </body>
 </html>
