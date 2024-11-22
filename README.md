@@ -117,8 +117,20 @@ JavaScript code.
 
 ## Installation & Usage
 
-Currently, you can use `jshtml` by copying the `jshtml.js` file into your project. The library will soon be available on
-NPM and JSR.
+You can use `jshtml` by simply copying the `jshtml.js` file into your project. It's a single JavaScript file without any
+dependencies, and will not require transpilation.
+
+You can also install from [JSR](https://jsr.io/@aakashns/jshtml) it as follows:
+
+```bash
+npx jsr add @aakashns/jshtml
+```
+
+or
+
+```bash
+deno add jsr:@aakashns/jshtml
+```
 
 To use it, just import `jshtml` from `jshtml.js`:
 
