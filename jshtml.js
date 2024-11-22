@@ -10,7 +10,7 @@ const jshtml = {
    * Renders a JSHTML element into a valid spec-compliant HTML string
    * Supports raw data types and well as array-based JSHTML elements
    *
-   * @param element - The JSHTML element to be rendered as HTML
+   * @param {any} element - The JSHTML element to be rendered as HTML
    * @returns {string} - The HTML string representation of the element
    */
   renderToHtml(element) {
@@ -82,8 +82,8 @@ const jshtml = {
    * Renders a JSHTML element into JSON-serializable format
    * Invokes all function components with their props and children
    *
-   * @param element - The JSHTML element to be rendered as HTML
-   * @returns - A JSON-serializable representation of the element
+   * @param {any} element - The JSHTML element to be rendered as HTML
+   * @returns {any} - A JSON-serializable representation of the element
    */
   renderToJson(element) {
     const elType = typeof element;
@@ -138,6 +138,7 @@ const jshtml = {
   /**
    * Converts &, <, >, ", ' to escaped HTML codes to prevent XSS attacks
    * @param {string} unsafeStr - The string to be sanitized
+   * @returns {string} - The santized string
    */
   _escapeForHtml(unsafeStr) {
     jshtml._assert(typeof unsafeStr === "string", `'unsafeStr' must be a string`);
@@ -152,6 +153,7 @@ const jshtml = {
    * Handles boolean, null, and undefined values
    * Rejects illegal names and escapes values
    * @param {Object} attrs - HTML attribute key-value pairs
+   * @returns {string} - Attributes converted to a string
    */
   _attrsToStr(attrs) {
     jshtml._assert(jshtml._isObject(attrs), `'attrs' must be an object`);
@@ -174,8 +176,8 @@ const jshtml = {
    * Checks if a string is a valid HTML attribute name
    * Based on {@link https://dev.w3.org/html5/spec-LC/syntax.html#syntax-attributes}
    *
-   * @param {*} name - The attribute name to validate
-   * @returns - `true` if `name` is valid, `false` otherwise
+   * @param {string} name - The attribute name to validate
+   * @returns {boolean} - `true` if `name` is valid, `false` otherwise
    */
   _isValidAttr(name) {
     jshtml._assert(typeof name === "string", "'name' must be a string");
@@ -226,20 +228,37 @@ const jshtml = {
     "wbr",
   ],
 
-  /* Checks if a value is a non-null non-array object */
+  /**
+   * Checks if a value is a non-null non-array object
+   * @param {any} val - The value to be checked
+   * @returns {boolean} - `true` or `false`
+   */
   _isObject(val) {
     return typeof val === "object" && val !== null && !Array.isArray(val);
   },
 
-  /* Makes an assertion and throws if it fails */
+  /**
+   * Evaulates and expression and throws if it is `false`
+   *
+   * @param {any} expr - The expression to be checked
+   * @param {string} [msg] - Message to be included in the error
+   * @returns {undefined} - No return value
+   * @throws {jshtml.AssertionError} - If `expr` evaluates to false
+   */
   _assert(expr, msg = "") {
     if (!expr) throw new jshtml.AssertionError(msg);
   },
 
-  /* Asserts a value using a function and returns it */
-  _makeAssert(func, msg = "") {
+  /**
+   * Creates a function to asserts a value using a given predicate
+   *
+   * @param {function} predicate - The predicate to be used for assertion
+   * @param {string} msg - The message to be included in the error
+   * @returns {function} - A function that accepts a value and asserts `predicate`
+   */
+  _makeAssert(predicate, msg = "") {
     return function (value) {
-      jshtml._assert(func(value), msg);
+      jshtml._assert(predicate(value), msg);
       return value;
     };
   },
