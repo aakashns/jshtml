@@ -100,15 +100,24 @@ const jshtml = {
   },
 
   /* Destructure an element into tag, props, and children */
+
+  /**
+   * Parses an array representing a JSHTML element into tag, props, and children
+   * @param {Array} element - A non-empty array where:
+   *   - The first item is the tag (string or function).
+   *   - The second item (optional) is an object of properties (`props`).
+   *   - Remaining items are children (unless `children` is included `props`).
+   * @returns {Object} - an object with keys `tag`, `props`, and `children`
+   */
   parseArray(element) {
     jshtml._assert(Array.isArray(element) && element.length > 0, "'element' must be a non-empty array");
+    const [tag, props] = element;
+    jshtml._assert(typeof tag === "string" || typeof tag === "function", "'element[0]' must be a string or function");
     const assertResult = jshtml._makeAssert((r) => typeof r === "object", "result must be an object");
 
-    const tag = element[0];
     // No props
     if (!jshtml._isObject(element[1])) return assertResult({ tag, props: {}, children: element.slice(1) });
 
-    const props = element[1];
     // Children within props
     if ("children" in props) {
       if (element.length > 2) throw Error("Include children within or after 'props' but not both");
