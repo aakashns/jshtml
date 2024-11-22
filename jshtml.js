@@ -1,3 +1,10 @@
+/**
+ * `jsthml` is a lightweight library for writing clean and performant HTML in pure JavaScript. Create HTML elements and
+ * custom components naturally using JavaScript arrays and functions, then render them to spec-compliant HTML strings or
+ * serializable JSON.
+ *
+ * For usage and docs, see the README at {@link https://github.com/aakashns/jshtml}
+ */
 const jshtml = {
   /**
    * Renders a JSHTML element into a valid spec-compliant HTML string
