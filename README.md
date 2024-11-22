@@ -369,7 +369,7 @@ Both approaches support components, props, and children with very similar patter
 them.
 
 **NOTE:** `jshtml` does not support state, hooks, lifecycle methods and other such features for building dynamic UIs as
-its primary purpose is togenerate HTML strings.
+its primary purpose is to generate HTML strings.
 
 ## Acknowledgement
 
