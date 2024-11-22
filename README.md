@@ -15,29 +15,32 @@ function App() {
   const title = "My JSHTML App";
   const items = ["Apple", "Banana", "Orange"];
 
+  // Use nested arrays to create HTML elements
   return [
     `html`,
     [`head`, [`title`, title]],
     [
       `body`,
-      { class: "container" },
+      { class: "container" }, // Use objects for attributes
       [Header, { title }],
       [
         `main`,
         [`h2`, "Favorite Fruits"],
         [`ul`, { children: items.map((item) => [`li`, item]) }],
       ],
-      [Footer],
+      [Footer, [`p`, "Visit our website for more."]],
     ],
   ];
 }
 
+// Components can accept props
 function Header({ title }) {
   return [`header`, [`h1`, { class: "title" }, title]];
 }
 
-function Footer() {
-  return [`footer`, [`p`, "© 2024 JSHTML"]];
+// Components can accept children
+function Footer({ children }) {
+  return [`footer`, [`p`, "© 2024 JSHTML"], ...children];
 }
 
 // Render to a spec-compliant HTML string
