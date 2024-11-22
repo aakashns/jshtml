@@ -1,7 +1,7 @@
 # `jshtml` - Clean & Performant HTML in Pure JavaScript
 
 `jshtml` is a lightweight library for writing clean and performant HTML in pure JavaScript. Write components naturally
-using JavaScript functions and arrays, then render them to spec-compliant HTML strings or serializable JSON.
+using JavaScript functions and arrays, then render them to spec-compliant HTML strings.
 
 `jshtml` provides a [JSX](https://facebook.github.io/jsx)-like developer experience without requiring any transpilation
 or build tools. `jshtml` has no dependencies and can be used on a server on within a browser.
