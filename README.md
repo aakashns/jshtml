@@ -76,7 +76,7 @@ This will output clean, spec-compliant HTML (without any spaces or indentation):
 </html>
 ```
 
-The same element can also be rendered to serializable JSON that can be edited programmatically or sent over the wire:
+The element can also be rendered to serializable JSON that can be edited programmatically or sent over the wire:
 
 ```javascript
 const json = jshtml.renderToHtml([App]);
@@ -358,3 +358,9 @@ them.
 
 **NOTE:** `jshtml` does not support state, hooks, lifecycle methods and other such features for building dynamic UIs as
 its primary purpose is togenerate HTML strings.
+
+## Acknowledgement
+
+`jshtml` borrows heavily from the work done by the late [Jason Knight](https://deathshadow.medium.com/) on a library
+called [DOM-JON](https://deathshadow.medium.com/building-a-better-javascript-dom-builder-part-1-4bf7b3639e5b), a
+browser-only implementation of a similar syntax for efficient DOM manipulation in pure JavaScript.
