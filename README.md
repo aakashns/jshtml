@@ -5,7 +5,7 @@
 Write components naturally using JavaScript functions and arrays, then render them to spec-compliant HTML strings or
 serializable JSON.
 
-## Complete Example
+Here's an example showing JSHTML sytax and rendering:
 
 ```javascript
 import jshtml from "./jshtml.js";
