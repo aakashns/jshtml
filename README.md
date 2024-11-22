@@ -225,9 +225,12 @@ components to break your HTML page into modular, reusable pieces.
 For cases where you need to insert pre-formatted HTML, use the `rawHtml` prop:
 
 ```javascript
-[`div`, {
-  rawHtml: "<strong>Pre-formatted</strong> HTML",
-}];
+const element = [
+  `div`,
+  {
+    rawHtml: "<strong>Pre-formatted</strong> HTML",
+  },
+];
 ```
 
 Note: Use this carefully as the content is not escaped!
@@ -239,7 +242,11 @@ Note: Use this carefully as the content is not escaped!
 Convert JSHTML elements to HTML strings:
 
 ```javascript
-const element = [`div`, { class: "greeting" }, "Hello, World!"];
+const element = [
+  `div`,
+  { class: "greeting" },
+  "Hello, World!",
+];
 const html = jshtml.renderToHtml(element);
 // <div class="greeting">Hello, World!</div>
 ```
@@ -249,18 +256,28 @@ const html = jshtml.renderToHtml(element);
 Convert JSHTML elements to JSON-safe format (useful for sending over network):
 
 ```javascript
-const element = [`div`, { class: "greeting" }, "Hello, World!"];
+const element = [
+  `div`,
+  { class: "greeting" },
+  "Hello, World!",
+];
 const json = jshtml.renderToJson(element);
 // ["div", { "class": "greeting" }, "Hello, World!"]
 ```
 
+The output of `renderToJson` can be passed to `renderToHtml` to generate the same HTML output as the original element.
+
 ## Comparison with JSX
 
-JSHTML provides a similar developer experience to JSX but with several advantages:
+`jshtml` provides a similar developer experience to JSX but with several advantages:
 
-✅ No build tools or transpilation needed ✅ Works with vanilla JavaScript ✅ Fully typed and predictable ✅ Smaller
-bundle size ✅ Easier to debug (just arrays and objects) ✅ Can be serialized to JSON ✅ Runtime validation of tags and
-attributes
+- ✅ No build tools or transpilation needed
+- ✅ Works with vanilla JavaScript
+- ✅ Fully typed and predictable
+- ✅ Smaller bundle size
+- ✅ Easier to debug (just arrays and objects)
+- ✅ Can be serialized to JSON
+- ✅ Runtime validation of tags and attributes
 
 The main difference in syntax is using arrays instead of XML-like notation:
 
@@ -271,9 +288,17 @@ The main difference in syntax is using arrays instead of XML-like notation:
   <p>Content</p>
 </div>;
 
-// JSHTML
-[`div`, { class: "container" }, [`h1`, title], [`p`, "Content"]];
+// jshtml
+[
+  `div`,
+  { class: "container" },
+  [`h1`, title],
+  [`p`, "Content"],
+];
 ```
 
 Both approaches support components, props, and children with very similar patterns, making it easy to transition between
 them.
+
+NOTE: `jshtml` does not support state, hooks, lifecycle methods and other such features for building dynamic UIs as its
+primary purpose is togenerate HTML strings.
