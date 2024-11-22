@@ -208,67 +208,67 @@ Deno.test(`${renderToJson.name} - throws if children are included twice for a fu
   assertThrows(() => renderToJson(input), Error, "Include children within or after 'props' but not both");
 });
 
-const { parseArray } = jshtml;
+const { _parseArray } = jshtml;
 
-Deno.test(`${parseArray.name} - throws if 'element' is not a non-empty array`, () => {
+Deno.test(`${_parseArray.name} - throws if 'element' is not a non-empty array`, () => {
   const msg = "'element' must be a non-empty array";
-  assertThrows(() => parseArray("Hello"), Error, msg); // String
-  assertThrows(() => parseArray(23), Error, msg); // Number
-  assertThrows(() => parseArray(null), Error, msg); // Null
-  assertThrows(() => parseArray([]), Error, msg); // Empty array
+  assertThrows(() => _parseArray("Hello"), Error, msg); // String
+  assertThrows(() => _parseArray(23), Error, msg); // Number
+  assertThrows(() => _parseArray(null), Error, msg); // Null
+  assertThrows(() => _parseArray([]), Error, msg); // Empty array
 });
 
-Deno.test(`${parseArray.name} - parses separate props and children correctly`, () => {
+Deno.test(`${_parseArray.name} - parses separate props and children correctly`, () => {
   const input = [`div`, { class: "container" }, "Hello, ", "world"];
   const expected = { tag: `div`, props: { class: "container" }, children: ["Hello, ", "world"] };
-  assertEquals(parseArray(input), expected);
+  assertEquals(_parseArray(input), expected);
 });
 
-Deno.test(`${parseArray.name} - parses children within props correctly`, () => {
+Deno.test(`${_parseArray.name} - parses children within props correctly`, () => {
   const input = [`div`, { class: "container", children: ["Hello, ", "world"] }];
   const expected = { tag: `div`, props: { class: "container" }, children: ["Hello, ", "world"] };
-  assertEquals(parseArray(input), expected);
+  assertEquals(_parseArray(input), expected);
 });
 
-Deno.test(`${parseArray.name} - throws if children are included twice`, () => {
+Deno.test(`${_parseArray.name} - throws if children are included twice`, () => {
   const input = [`div`, { class: "container", children: ["Hello, ", "world"] }, "Hola"];
-  assertThrows(() => parseArray(input), Error, "Include children within or after 'props' but not both");
+  assertThrows(() => _parseArray(input), Error, "Include children within or after 'props' but not both");
 });
 
-Deno.test(`${parseArray.name} - throws if children is not an array`, () => {
+Deno.test(`${_parseArray.name} - throws if children is not an array`, () => {
   const input = [`div`, { class: "container", children: "'children' must be an array of elements" }];
-  assertThrows(() => parseArray(input), Error, "helo");
+  assertThrows(() => _parseArray(input), Error, "helo");
 });
 
-const { escapeForHtml } = jshtml;
+const { _escapeForHtml } = jshtml;
 
-Deno.test(`${escapeForHtml.name} - escapes &, <, >, \", and '`, () => {
+Deno.test(`${_escapeForHtml.name} - escapes &, <, >, \", and '`, () => {
   const input = 'Tom & Jerry\'s < "quotes" >';
   const escapedOutput = "Tom &amp; Jerry&#39;s &lt; &quot;quotes&quot; &gt;";
-  assertEquals(escapeForHtml(input), escapedOutput);
+  assertEquals(_escapeForHtml(input), escapedOutput);
 });
 
-Deno.test(`${escapeForHtml.name} - escapes XSS attack vectors`, () => {
+Deno.test(`${_escapeForHtml.name} - escapes XSS attack vectors`, () => {
   const xssInput = `<script>alert('XSS')</script>`;
   const escapedOutput = `&lt;script&gt;alert(&#39;XSS&#39;)&lt;/script&gt;`;
-  assertEquals(escapeForHtml(xssInput), escapedOutput);
+  assertEquals(_escapeForHtml(xssInput), escapedOutput);
 });
 
-Deno.test(`${escapeForHtml.name} - throws for non-string input`, () => {
+Deno.test(`${_escapeForHtml.name} - throws for non-string input`, () => {
   const message = "'unsafeStr' must be a string";
-  assertThrows(() => escapeForHtml(123), Error, message);
-  assertThrows(() => escapeForHtml(null), Error, message);
-  assertThrows(() => escapeForHtml(undefined), Error, message);
-  assertThrows(() => escapeForHtml({}), Error, message);
+  assertThrows(() => _escapeForHtml(123), Error, message);
+  assertThrows(() => _escapeForHtml(null), Error, message);
+  assertThrows(() => _escapeForHtml(undefined), Error, message);
+  assertThrows(() => _escapeForHtml({}), Error, message);
 });
 
-const { attrsToStr } = jshtml;
+const { _attrsToStr } = jshtml;
 
-Deno.test(`${attrsToStr.name} - renders empty object`, () => {
-  assertEquals(attrsToStr({}), "");
+Deno.test(`${_attrsToStr.name} - renders empty object`, () => {
+  assertEquals(_attrsToStr({}), "");
 });
 
-Deno.test(`${attrsToStr.name} - renders a mix of different value types`, () => {
+Deno.test(`${_attrsToStr.name} - renders a mix of different value types`, () => {
   const input = {
     class: "btn primary",
     disabled: true,
@@ -280,100 +280,100 @@ Deno.test(`${attrsToStr.name} - renders a mix of different value types`, () => {
     height: 34,
   };
   const expected = ` class="btn primary" disabled id="submit-btn" onClick="alert(&quot;clicked&quot;)" height="34"`;
-  const result = attrsToStr(input);
+  const result = _attrsToStr(input);
   assertEquals(result, expected);
 });
 
-Deno.test(`${attrsToStr.name} - throws for non-object inputs`, () => {
+Deno.test(`${_attrsToStr.name} - throws for non-object inputs`, () => {
   const input = "test";
   const msg = "'attrs' must be an object";
-  assertThrows(() => attrsToStr(input), Error, msg);
+  assertThrows(() => _attrsToStr(input), Error, msg);
 });
 
-Deno.test(`${attrsToStr.name} - throws for illegal attribute names`, () => {
+Deno.test(`${_attrsToStr.name} - throws for illegal attribute names`, () => {
   const input = { "illegal>attr": "value" };
   const msg = "Illegal attribute name: illegal>attr";
-  assertThrows(() => attrsToStr(input), Error, msg);
+  assertThrows(() => _attrsToStr(input), Error, msg);
 });
 
-const { isValidAttr } = jshtml;
+const { _isValidAttr } = jshtml;
 
-Deno.test(`${isValidAttr.name} - returns false for the empty string`, () => {
-  assertEquals(isValidAttr(""), false);
+Deno.test(`${_isValidAttr.name} - returns false for the empty string`, () => {
+  assertEquals(_isValidAttr(""), false);
 });
 
-Deno.test(`${isValidAttr.name} - returns true for a valid attribute name`, () => {
-  assertEquals(isValidAttr("data-id"), true);
-  assertEquals(isValidAttr("class"), true);
-  assertEquals(isValidAttr("aria-label"), true);
+Deno.test(`${_isValidAttr.name} - returns true for a valid attribute name`, () => {
+  assertEquals(_isValidAttr("data-id"), true);
+  assertEquals(_isValidAttr("class"), true);
+  assertEquals(_isValidAttr("aria-label"), true);
 });
 
-Deno.test(`${isValidAttr.name} - returns false for invalid characters`, () => {
-  assertEquals(isValidAttr("data id"), false); // space
-  assertEquals(isValidAttr("data<id"), false); // `<`
-  assertEquals(isValidAttr('data"id'), false); // `"`
-  assertEquals(isValidAttr("data'id"), false); // `'`
-  assertEquals(isValidAttr("data=id"), false); // `=`
-  assertEquals(isValidAttr("data/id"), false); // `/`
-  assertEquals(isValidAttr("data\\id"), false); // `\`
+Deno.test(`${_isValidAttr.name} - returns false for invalid characters`, () => {
+  assertEquals(_isValidAttr("data id"), false); // space
+  assertEquals(_isValidAttr("data<id"), false); // `<`
+  assertEquals(_isValidAttr('data"id'), false); // `"`
+  assertEquals(_isValidAttr("data'id"), false); // `'`
+  assertEquals(_isValidAttr("data=id"), false); // `=`
+  assertEquals(_isValidAttr("data/id"), false); // `/`
+  assertEquals(_isValidAttr("data\\id"), false); // `\`
 });
 
-Deno.test(`${isValidAttr.name} - returns false for control characters`, () => {
-  assertEquals(isValidAttr("data\u0000id"), false); // Null character
-  assertEquals(isValidAttr("data\u001Fid"), false); // Unit Separator
+Deno.test(`${_isValidAttr.name} - returns false for control characters`, () => {
+  assertEquals(_isValidAttr("data\u0000id"), false); // Null character
+  assertEquals(_isValidAttr("data\u001Fid"), false); // Unit Separator
 });
 
-Deno.test(`${isValidAttr.name} - returns false for noncharacters`, () => {
-  assertEquals(isValidAttr("data\uFDD0id"), false); // Noncharacter U+FDD0
-  assertEquals(isValidAttr("data\uFFFEid"), false); // Noncharacter U+FFFE
-  assertEquals(isValidAttr("data\uFFFFid"), false); // Noncharacter U+FFFF
+Deno.test(`${_isValidAttr.name} - returns false for noncharacters`, () => {
+  assertEquals(_isValidAttr("data\uFDD0id"), false); // Noncharacter U+FDD0
+  assertEquals(_isValidAttr("data\uFFFEid"), false); // Noncharacter U+FFFE
+  assertEquals(_isValidAttr("data\uFFFFid"), false); // Noncharacter U+FFFF
 });
 
-Deno.test(`${isValidAttr.name} - throws for non-string input`, () => {
-  assertThrows(() => isValidAttr(123), Error, "'name' must be a string");
-  assertThrows(() => isValidAttr({}), Error, "'name' must be a string");
-  assertThrows(() => isValidAttr(null), Error, "'name' must be a string");
-  assertThrows(() => isValidAttr(undefined), Error, "'name' must be a string");
+Deno.test(`${_isValidAttr.name} - throws for non-string input`, () => {
+  assertThrows(() => _isValidAttr(123), Error, "'name' must be a string");
+  assertThrows(() => _isValidAttr({}), Error, "'name' must be a string");
+  assertThrows(() => _isValidAttr(null), Error, "'name' must be a string");
+  assertThrows(() => _isValidAttr(undefined), Error, "'name' must be a string");
 });
 
-const { isValidTag } = jshtml;
+const { _isValidTag } = jshtml;
 
-Deno.test(`${isValidTag.name} - returns false for invalid tag names`, () => {
-  assertEquals(isValidTag(""), false);
-  assertEquals(isValidTag("123"), false); // Starts with a number
-  assertEquals(isValidTag("-tag"), false); // Starts with a hyphen
-  assertEquals(isValidTag("ta@ag"), false); // Contains invalid character
+Deno.test(`${_isValidTag.name} - returns false for invalid tag names`, () => {
+  assertEquals(_isValidTag(""), false);
+  assertEquals(_isValidTag("123"), false); // Starts with a number
+  assertEquals(_isValidTag("-tag"), false); // Starts with a hyphen
+  assertEquals(_isValidTag("ta@ag"), false); // Contains invalid character
 });
 
-Deno.test(`${isValidTag.name} - returns true for valid HTML tag names`, () => {
-  assertEquals(isValidTag("div"), true);
-  assertEquals(isValidTag("p"), true);
-  assertEquals(isValidTag("span"), true);
-  assertEquals(isValidTag("h1"), true);
+Deno.test(`${_isValidTag.name} - returns true for valid HTML tag names`, () => {
+  assertEquals(_isValidTag("div"), true);
+  assertEquals(_isValidTag("p"), true);
+  assertEquals(_isValidTag("span"), true);
+  assertEquals(_isValidTag("h1"), true);
 });
 
-Deno.test(`${isValidTag.name} - returns false for invalid custom element names`, () => {
-  assertEquals(isValidTag("-custom-element"), false); // Starts with hyphen
-  assertEquals(isValidTag("custom..element"), false); // Double periods
+Deno.test(`${_isValidTag.name} - returns false for invalid custom element names`, () => {
+  assertEquals(_isValidTag("-custom-element"), false); // Starts with hyphen
+  assertEquals(_isValidTag("custom..element"), false); // Double periods
 });
 
-Deno.test(`${isValidTag.name} - returns true for valid custom element names`, () => {
-  assertEquals(isValidTag("custom-element"), true);
-  assertEquals(isValidTag("my-widget"), true);
-  assertEquals(isValidTag("app-container"), true);
-  assertEquals(isValidTag("x-tag"), true);
-  assertEquals(isValidTag("my-custom-element"), true); // multiple hyphens
-  assertEquals(isValidTag("custom-element-"), true); // ends with hyphen
-  assertEquals(isValidTag("widget-🌟"), false); // Emoji
+Deno.test(`${_isValidTag.name} - returns true for valid custom element names`, () => {
+  assertEquals(_isValidTag("custom-element"), true);
+  assertEquals(_isValidTag("my-widget"), true);
+  assertEquals(_isValidTag("app-container"), true);
+  assertEquals(_isValidTag("x-tag"), true);
+  assertEquals(_isValidTag("my-custom-element"), true); // multiple hyphens
+  assertEquals(_isValidTag("custom-element-"), true); // ends with hyphen
+  assertEquals(_isValidTag("widget-🌟"), false); // Emoji
 });
 
-Deno.test(`${isValidTag.name} - supports Unicode characters for custom elements`, () => {
-  assertEquals(isValidTag("x-élement"), true);
-  assertEquals(isValidTag("tag-アニメ"), true);
+Deno.test(`${_isValidTag.name} - supports Unicode characters for custom elements`, () => {
+  assertEquals(_isValidTag("x-élement"), true);
+  assertEquals(_isValidTag("tag-アニメ"), true);
 });
 
-Deno.test(`${isValidTag.name} - throws an error when 'name' is not a string`, () => {
-  assertThrows(() => isValidTag(123), Error, "'name' must be a string");
-  assertThrows(() => isValidTag(null), Error, "'name' must be a string");
-  assertThrows(() => isValidTag(undefined), Error, "'name' must be a string");
+Deno.test(`${_isValidTag.name} - throws an error when 'name' is not a string`, () => {
+  assertThrows(() => _isValidTag(123), Error, "'name' must be a string");
+  assertThrows(() => _isValidTag(null), Error, "'name' must be a string");
+  assertThrows(() => _isValidTag(undefined), Error, "'name' must be a string");
 });

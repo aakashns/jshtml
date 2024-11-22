@@ -23,13 +23,13 @@ const jshtml = {
     if (element === null || element === undefined || element === false) return assertResult("");
 
     // Text
-    if (elType === "string") return assertResult(jshtml.escapeForHtml(element));
+    if (elType === "string") return assertResult(jshtml._escapeForHtml(element));
 
     // Other primitive types
     if (elType === "number" || elType === "boolean" || elType === "bigint") return assertResult(element.toString());
 
     // Array
-    const { tag, props, children } = jshtml.parseArray(element);
+    const { tag, props, children } = jshtml._parseArray(element);
     // Empty tag
     if (tag === ``) {
       const { rawHtml, ...attrs } = props;
@@ -47,9 +47,9 @@ const jshtml = {
 
       // HTML tag
     } else if (typeof tag === "string") {
-      if (!jshtml.isValidTag(tag)) throw Error(`Invalid tag name: ${tag}`);
+      if (!jshtml._isValidTag(tag)) throw Error(`Invalid tag name: ${tag}`);
       const { rawHtml, ...attrs } = props;
-      const attrsStr = jshtml.attrsToStr(attrs);
+      const attrsStr = jshtml._attrsToStr(attrs);
 
       // Void Tag
       if (jshtml.VOID_TAGS.indexOf(tag) !== -1) {
@@ -95,7 +95,7 @@ const jshtml = {
     );
 
     if (!Array.isArray(element)) return assertResult(element);
-    const { tag, props, children } = jshtml.parseArray(element);
+    const { tag, props, children } = jshtml._parseArray(element);
     if (typeof tag === "string") {
       const renderedChildren = children.map(jshtml.renderToJson);
       const hasProps = Object.keys(props).length > 0;
@@ -114,7 +114,7 @@ const jshtml = {
    *   - Remaining items are children (unless `children` is included `props`).
    * @returns {Object} - an object with keys `tag`, `props`, and `children`
    */
-  parseArray(element) {
+  _parseArray(element) {
     jshtml._assert(Array.isArray(element) && element.length > 0, "'element' must be a non-empty array");
     const [tag, props] = element;
     jshtml._assert(typeof tag === "string" || typeof tag === "function", "'element[0]' must be a string or function");
@@ -139,7 +139,7 @@ const jshtml = {
    * Converts &, <, >, ", ' to escaped HTML codes to prevent XSS attacks
    * @param {string} unsafeStr - The string to be sanitized
    */
-  escapeForHtml(unsafeStr) {
+  _escapeForHtml(unsafeStr) {
     jshtml._assert(typeof unsafeStr === "string", `'unsafeStr' must be a string`);
     const assertResult = jshtml._makeAssert((res) => typeof res === "string", "result must be a string");
 
@@ -153,7 +153,7 @@ const jshtml = {
    * Rejects illegal names and escapes values
    * @param {Object} attrs - HTML attribute key-value pairs
    */
-  attrsToStr(attrs) {
+  _attrsToStr(attrs) {
     jshtml._assert(jshtml._isObject(attrs), `'attrs' must be an object`);
     const assertResult = jshtml._makeAssert((res) => typeof res === "string", "result must be a string");
 
@@ -161,10 +161,10 @@ const jshtml = {
     const attrsStr = Object.keys(attrs)
       .filter((name) => emptyVals.indexOf(attrs[name]) === -1)
       .map((name) => {
-        jshtml._assert(jshtml.isValidAttr(name), `Illegal attribute name: ${name}`);
+        jshtml._assert(jshtml._isValidAttr(name), `Illegal attribute name: ${name}`);
         const value = attrs[name];
         if (value === true) return ` ${name}`;
-        return ` ${name}="${jshtml.escapeForHtml(value.toString())}"`;
+        return ` ${name}="${jshtml._escapeForHtml(value.toString())}"`;
       })
       .join("");
     return assertResult(attrsStr);
@@ -177,7 +177,7 @@ const jshtml = {
    * @param {*} name - The attribute name to validate
    * @returns - `true` if `name` is valid, `false` otherwise
    */
-  isValidAttr(name) {
+  _isValidAttr(name) {
     jshtml._assert(typeof name === "string", "'name' must be a string");
     const assertResult = jshtml._makeAssert((r) => typeof r === "boolean", "'result' must be a boolean");
 
@@ -196,7 +196,7 @@ const jshtml = {
    * @param {string} name - The tag name to validate
    * @returns {boolean} `true` if `name` is valid, `false` otherwise
    */
-  isValidTag(name) {
+  _isValidTag(name) {
     jshtml._assert(typeof name === "string", "'name' must be a string");
     const assertResult = jshtml._makeAssert((r) => typeof r === "boolean", "'result' must be a boolean");
 
