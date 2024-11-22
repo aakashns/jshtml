@@ -98,27 +98,48 @@ HTML elements are represented as arrays where the first element is the tag name 
 
 ```javascript
 // Basic elements
-[`div`, "Hello world"][`br`][`p`, { class: "text" }, "Some text"] // Nesting elements
-  [`div`, [`h1`, "Title"], [`p`, "Paragraph"]];
+const element1 = [
+  `div`,
+  "Hello world",
+];
+
+const element2 = [`br`];
+
+const element3 = [
+  `p`,
+  { class: "text" },
+  "Some text",
+];
+
+// Nesting elements
+const element4 = [
+  `div`,
+  [`h1`, "Title"],
+  [`p`, "Paragraph"],
+];
 ```
 
 ### Attributes (Props)
 
-Attributes are specified as an object in the second position of the array:
+Attributes can be specified (optionally) as an object in the second position of the array:
 
 ```javascript
-[`button`, {
-  type: "submit",
-  class: "btn primary",
-  disabled: true,
-  "data-id": "123",
-}];
+const element = [
+  `button`,
+  {
+    type: "submit",
+    class: "btn primary",
+    disabled: true,
+    "data-id": "123",
+  },
+  "Submit",
+];
 ```
 
-Special cases:
+Special cases for rendering HTML:
 
-- Boolean attributes (like `disabled`) will be included if `true`, omitted if `false`
-- `null` and `undefined` values are omitted
+- Boolean attributes (like `disabled`) will be included if set to true `true`, and omitted if `false`
+- Attributes with `null` and `undefined` values are omitted
 - Values are automatically converted to strings and properly escaped
 
 ### Children
@@ -128,10 +149,23 @@ Children can be provided in two ways:
 1. As additional array elements after the tag and props:
 
 ```javascript
-[`div`, [`h1`, "Title"], [`p`, "First paragraph"], [`p`, "Second paragraph"]];
+const element1 = [
+  `div`,
+  [`h1`, "Title"],
+  [`p`, "First paragraph"],
+  [`p`, "Second paragraph"],
+];
+
+const element2 = [
+  `div`,
+  { class: "container" },
+  [`h1`, "Title"],
+  [`p`, "First paragraph"],
+  [`p`, "Second paragraph"],
+];
 ```
 
-2. As a `children` prop:
+2. As a `children` prop (must be an array of elements):
 
 ```javascript
 [`div`, {
@@ -143,32 +177,39 @@ Children can be provided in two ways:
 }];
 ```
 
-Children can be:
+Individual children can be:
 
 - Strings (automatically escaped)
 - Numbers (converted to strings)
-- Arrays (nested elements)
+- Arrays representing `jshtml` elements
 - `null`, `undefined`, or `false` (ignored)
-- Component function calls
 
 ### Components
 
-Components are regular JavaScript functions that return JSHTML elements:
+Components are regular JavaScript functions that return `jshtml` elements, and can be used just like regular HTML tags:
 
 ```javascript
 function Button({ type = "button", onClick, children }) {
-  return [`button`, {
-    type,
-    class: "btn",
-    onclick: onClick,
-  }, ...children];
+  return [
+    `button`,
+    {
+      type,
+      class: "btn",
+      onclick: onClick,
+    },
+    ...children,
+  ];
 }
 
 // Usage
-[Button, {
-  type: "submit",
-  onClick: "handleClick()",
-}, "Click me"];
+const element = [
+  Button,
+  {
+    type: "submit",
+    onClick: "handleClick()",
+  },
+  "Click me",
+];
 ```
 
 ### Raw HTML
