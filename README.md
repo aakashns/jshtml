@@ -136,7 +136,7 @@ const element = [
 ];
 ```
 
-Non-string values are handled as follows while rendering:
+Non-string attribute values are handled as follows while rendering:
 
 - Boolean attributes (like `disabled`) will be included if set to true `true`, and omitted if `false`
 - Attributes with `null` and `undefined` values are omitted
@@ -165,7 +165,7 @@ const element2 = [
 ];
 ```
 
-2. As a `children` prop (must be an array of elements):
+2. As the `children` prop (must be an array of elements):
 
 ```javascript
 [`div`, {
@@ -179,14 +179,15 @@ const element2 = [
 
 Individual children can be:
 
-- Strings (automatically escaped)
+- Strings (automatically escaped to prevent XSS attacks)
 - Numbers (converted to strings)
 - Arrays representing `jshtml` elements
 - `null`, `undefined`, or `false` (ignored)
 
 ### Components
 
-Components are regular JavaScript functions that return `jshtml` elements, and can be used just like regular HTML tags:
+Components are regular JavaScript functions that accept a single object containing props and children and return
+`jshtml` element:
 
 ```javascript
 function Button({ type = "button", onClick, children }) {
@@ -200,7 +201,11 @@ function Button({ type = "button", onClick, children }) {
     ...children,
   ];
 }
+```
 
+Once defined, they can be used in place of regular HTML tags:
+
+```javascript
 // Usage
 const element = [
   Button,
@@ -211,6 +216,9 @@ const element = [
   "Click me",
 ];
 ```
+
+The syntax for defining and using components is nearly identical to the JSX syntax used by libraries like React. Use
+components to break your HTML page into modular, reusable pieces.
 
 ### Raw HTML
 
