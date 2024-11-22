@@ -76,6 +76,45 @@ This will output clean, spec-compliant HTML (without any spaces or indentation):
 </html>
 ```
 
+The same element can also be rendered to serializable JSON that can be edited programmatically or sent over the wire:
+
+```javascript
+const json = jshtml.renderToHtml([App]);
+console.log(json);
+```
+
+This produces the following JSON-serializable output:
+
+```json
+[
+  "html",
+  ["head", ["title", "My JSHTML App"]],
+  [
+    "body",
+    { "class": "container" },
+    ["header", ["h1", { "class": "title" }, "My JSHTML App"]],
+    [
+      "main",
+      ["h2", "Favorite Fruits"],
+      [
+        "ul",
+        ["li", "Apple"],
+        ["li", "Banana"],
+        ["li", "Orange"]
+      ]
+    ],
+    [
+      "footer",
+      ["p", "© 2024 JSHTML"],
+      ["p", "Visit our website for more."]
+    ]
+  ]
+]
+```
+
+Use `jshtml` in place of HTML templates (like Mustache, EJS, etc.) and JSX to construct and generate HTML within
+JavaScript code.
+
 ## Installation & Usage
 
 Currently, you can use `jshtml` by copying the `jshtml.js` file into your project. The library will soon be available on
