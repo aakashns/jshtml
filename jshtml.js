@@ -99,8 +99,6 @@ const jshtml = {
     throw Error("'element[0]' must be a string or a function");
   },
 
-  /* Destructure an element into tag, props, and children */
-
   /**
    * Parses an array representing a JSHTML element into tag, props, and children
    * @param {Array} element - A non-empty array where:
