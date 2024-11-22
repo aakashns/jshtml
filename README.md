@@ -235,7 +235,24 @@ const element = [
 
 Note: Use this carefully as the content is not escaped!
 
-## Rendering
+### Empty Tag (Fragment)
+
+For cases where you need to create a list of elements without an outer tag, you can use the empty tag `\`\``:
+
+```javascript
+const element = [
+  ``,
+  [`p`, "Hello, world"],
+  [`p`, "How are you today?"],
+];
+
+const html = jshtml.render(element);
+// <p>Hello, world</p><p>How are you today?</p>
+```
+
+The above element will be rendered as two `p` tags witout a parent.
+
+## Rendering `jshtml` Elements
 
 ### To HTML
 
@@ -300,5 +317,5 @@ The main difference in syntax is using arrays instead of XML-like notation:
 Both approaches support components, props, and children with very similar patterns, making it easy to transition between
 them.
 
-NOTE: `jshtml` does not support state, hooks, lifecycle methods and other such features for building dynamic UIs as its
-primary purpose is togenerate HTML strings.
+**NOTE:** `jshtml` does not support state, hooks, lifecycle methods and other such features for building dynamic UIs as
+its primary purpose is togenerate HTML strings.
