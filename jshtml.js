@@ -22,7 +22,7 @@ const jshtml = {
     if (elType === "number" || elType === "boolean" || elType === "bigint") return assertResult(element.toString());
 
     // Array
-    const { tag, props, children } = jshtml.destructure(element);
+    const { tag, props, children } = jshtml.parseArray(element);
     // Empty tag
     if (tag === ``) {
       const { rawHtml, ...attrs } = props;
@@ -88,7 +88,7 @@ const jshtml = {
     );
 
     if (!Array.isArray(element)) return assertResult(element);
-    const { tag, props, children } = jshtml.destructure(element);
+    const { tag, props, children } = jshtml.parseArray(element);
     if (typeof tag === "string") {
       const renderedChildren = children.map(jshtml.renderToJson);
       const hasProps = Object.keys(props).length > 0;
@@ -97,6 +97,28 @@ const jshtml = {
       return assertResult(jshtml.renderToJson(tag({ children, ...props })));
     }
     throw Error("'element[0]' must be a string or a function");
+  },
+
+  /* Destructure an element into tag, props, and children */
+  parseArray(element) {
+    jshtml._assert(Array.isArray(element) && element.length > 0, "'element' must be a non-empty array");
+    const assertResult = jshtml._makeAssert((r) => typeof r === "object", "result must be an object");
+
+    const tag = element[0];
+    // No props
+    if (!jshtml._isObject(element[1])) return assertResult({ tag, props: {}, children: element.slice(1) });
+
+    const props = element[1];
+    // Children within props
+    if ("children" in props) {
+      if (element.length > 2) throw Error("Include children within or after 'props' but not both");
+      const { children, ...rest } = props;
+      if (!Array.isArray(children)) throw Error("'children' must be an array of elements");
+      return assertResult({ tag, props: rest, children });
+    }
+
+    // Children after props
+    return assertResult({ tag, props, children: element.slice(2) });
   },
 
   /**
@@ -189,26 +211,6 @@ const jshtml = {
     "track",
     "wbr",
   ],
-
-  /* Destructure an element into tag, props, and children */
-  destructure(element) {
-    jshtml._assert(Array.isArray(element) && element.length > 0, "'element' must be a non-empty array");
-    const assertResult = jshtml._makeAssert((r) => typeof r === "object", "result must be an object");
-
-    const tag = element[0];
-    // Props present
-    if (jshtml._isObject(element[1])) {
-      const props = element[1];
-      if ("children" in props && element.length > 2) {
-        throw Error("Include children within or after 'props' but not both");
-      }
-      const children = "children" in props ? props.children : element.slice(2);
-      if (!Array.isArray(children)) throw Error("'children' must be an array of elements");
-      return assertResult({ tag, props, children });
-    }
-    // Props absent
-    return assertResult({ tag, props: {}, children: element.slice(1) });
-  },
 
   /* Checks if a value is a non-null non-array object */
   _isObject(val) {

@@ -208,6 +208,38 @@ Deno.test(`${renderToJson.name} - throws if children are included twice for a fu
   assertThrows(() => renderToJson(input), Error, "Include children within or after 'props' but not both");
 });
 
+const { parseArray } = jshtml;
+
+Deno.test(`${parseArray.name} - throws if 'element' is not a non-empty array`, () => {
+  const msg = "'element' must be a non-empty array";
+  assertThrows(() => parseArray("Hello"), Error, msg); // String
+  assertThrows(() => parseArray(23), Error, msg); // Number
+  assertThrows(() => parseArray(null), Error, msg); // Null
+  assertThrows(() => parseArray([]), Error, msg); // Empty array
+});
+
+Deno.test(`${parseArray.name} - parses separate props and children correctly`, () => {
+  const input = [`div`, { class: "container" }, "Hello, ", "world"];
+  const expected = { tag: `div`, props: { class: "container" }, children: ["Hello, ", "world"] };
+  assertEquals(parseArray(input), expected);
+});
+
+Deno.test(`${parseArray.name} - parses children within props correctly`, () => {
+  const input = [`div`, { class: "container", children: ["Hello, ", "world"] }];
+  const expected = { tag: `div`, props: { class: "container" }, children: ["Hello, ", "world"] };
+  assertEquals(parseArray(input), expected);
+});
+
+Deno.test(`${parseArray.name} - throws if children are included twice`, () => {
+  const input = [`div`, { class: "container", children: ["Hello, ", "world"] }, "Hola"];
+  assertThrows(() => parseArray(input), Error, "Include children within or after 'props' but not both");
+});
+
+Deno.test(`${parseArray.name} - throws if children is not an array`, () => {
+  const input = [`div`, { class: "container", children: "'children' must be an array of elements" }];
+  assertThrows(() => parseArray(input), Error, "helo");
+});
+
 const { escapeForHtml } = jshtml;
 
 Deno.test(`${escapeForHtml.name} - escapes &, <, >, \", and '`, () => {
