@@ -49,7 +49,7 @@ const html = jshtml.renderToHtml([App]);
 console.log(html);
 ```
 
-This will output clean, spec-compliant HTML (wihtout spaces or indentation):
+This will output clean, spec-compliant HTML (without the spaces or indentation):
 
 ```html
 <html>
@@ -76,14 +76,19 @@ This will output clean, spec-compliant HTML (wihtout spaces or indentation):
 </html>
 ```
 
-## Installation
+## Installation & Usage
 
 Currently, you can use JSHTML by copying the `jshtml.js` file into your project. The library will soon be available on
 NPM and JSR.
 
+To use it, just import `jshtml` from `jshtml.js`:
+
 ```javascript
 import jshtml from "./jshtml.js";
 ```
+
+Construct JSHTML elements using arrays and functions as shown below, and render them using `jshtml.renderToHtml` or
+`jshtml.renderToJson`.
 
 ## How to Write JSHTML
 
