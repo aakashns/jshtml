@@ -1,6 +1,6 @@
 {
   "name": "@aakashns/jshtml",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "exports": "./jshtml.js",
   "tasks": {
     "coverage": "rm -rf ./coverage && deno test --coverage && deno coverage --html"
