@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@aakashns/jshtml": "jsr:@aakashns/jshtml@^0.0.8"
+  }
+}

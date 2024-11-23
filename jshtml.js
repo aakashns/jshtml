@@ -4,6 +4,9 @@
  * serializable JSON.
  *
  * For usage and docs, see the README at {@link https://github.com/aakashns/jshtml}
+ *
+ * * TODO:
+ * - [ ] Include `rawHtml` before children (and remove errors for both present case)
  */
 const jshtml = {
   /**
@@ -107,6 +110,15 @@ const jshtml = {
   },
 
   /**
+   * Create a "raw" HTML element that won't be escaped while rendering
+   * @param {string} htmlStr  - The raw HTML string
+   * @returns {any} - A `jshtml` element for the raw HTML
+   */
+  rawHtml(htmlStr) {
+    return [``, { rawHtml: htmlStr }];
+  },
+
+  /**
    * Parses an array representing a JSHTML element into tag, props, and children
    * @param {Array} element - A non-empty array where:
    *   - The first item is the tag (string or function).
@@ -199,8 +211,10 @@ const jshtml = {
    * @returns {boolean} `true` if `name` is valid, `false` otherwise
    */
   _isValidTag(name) {
-    jshtml._assert(typeof name === "string", "'name' must be a string");
+    jshtml._assert(typeof name === "string", "'name' must be a non-empty string");
     const assertResult = jshtml._makeAssert((r) => typeof r === "boolean", "'result' must be a boolean");
+
+    if (name.toLowerCase() === "!doctype") return true;
 
     const normalTagRegex = /^[a-zA-Z][a-zA-Z0-9]*$/;
     const customElementRegex =

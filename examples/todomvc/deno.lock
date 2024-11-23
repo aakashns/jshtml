@@ -1,0 +1,16 @@
+{
+  "version": "4",
+  "specifiers": {
+    "jsr:@aakashns/jshtml@^0.0.8": "0.0.8"
+  },
+  "jsr": {
+    "@aakashns/jshtml@0.0.8": {
+      "integrity": "0521cfa17b4daf66533f640d39a982e923c4c046f01ffb408f84b2e9d137dcc5"
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@aakashns/jshtml@^0.0.8"
+    ]
+  }
+}

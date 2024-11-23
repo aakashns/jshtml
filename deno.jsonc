@@ -1,6 +1,6 @@
 {
   "name": "@aakashns/jshtml",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "exports": "./jshtml.js",
   "tasks": {
     "coverage": "rm -rf ./coverage && deno test --coverage && deno coverage --html"
@@ -33,5 +33,6 @@
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.8"
-  }
+  },
+  "exclude": ["examples/"]
 }
