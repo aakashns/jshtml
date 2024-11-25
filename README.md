@@ -2,7 +2,7 @@
 
 `jshtml` is a lightweight library for writing clean and performant HTML in pure JavaScript. Create HTML elements and
 custom components naturally using JavaScript arrays and functions, then render them to spec-compliant HTML strings or
-serializable JSON. Use `jshtml` in place of HTML templates (like Mustache, EJS, etc.) and JSX to construct and generate HTML within
+serializable JSON. Use `jshtml` in place of HTML templates (like Mustache, Handlebars, EJS, etc.) JSX to construct and generate HTML within
 JavaScript code.
 
 `jshtml` provides a [JSX](https://facebook.github.io/jsx)-like developer experience without requiring any transpilation
