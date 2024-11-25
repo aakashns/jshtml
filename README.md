@@ -2,7 +2,8 @@
 
 `jshtml` is a lightweight library for writing clean and performant HTML in pure JavaScript. Create HTML elements and
 custom components naturally using JavaScript arrays and functions, then render them to spec-compliant HTML strings or
-serializable JSON.
+serializable JSON. Use `jshtml` in place of HTML templates (like Mustache, EJS, etc.) and JSX to construct and generate HTML within
+JavaScript code.
 
 `jshtml` provides a [JSX](https://facebook.github.io/jsx)-like developer experience without requiring any transpilation
 or build tools. `jshtml` has no dependencies and can be used to render HTML on a server on within the browser. The
@@ -112,8 +113,8 @@ This produces the following JSON-serializable output:
 ]
 ```
 
-Use `jshtml` in place of HTML templates (like Mustache, EJS, etc.) and JSX to construct and generate HTML within
-JavaScript code.
+The above object can be serialized to JSON, sent over the wire, and converted to an HTML string using `renderToHtml`.
+
 
 ## Installation & Usage
 
@@ -341,7 +342,6 @@ The output of `renderToJson` can be passed to `renderToHtml` to generate the sam
 
 - ✅ No build tools or transpilation needed
 - ✅ Works with vanilla JavaScript
-- ✅ Fully typed and predictable
 - ✅ Smaller bundle size
 - ✅ Easier to debug (just arrays and objects)
 - ✅ Can be serialized to JSON
