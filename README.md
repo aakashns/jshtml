@@ -80,7 +80,7 @@ This will output clean, spec-compliant HTML (without any spaces or indentation):
 The element can also be rendered to serializable JSON that can be edited programmatically or sent over the wire:
 
 ```javascript
-const json = jshtml.renderToHtml([App]);
+const json = jshtml.renderToJson([App]);
 console.log(json);
 ```
 
