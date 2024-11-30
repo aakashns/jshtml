@@ -1,6 +1,6 @@
-# `jshtml` - Clean & Performant HTML in Pure JavaScript
+# `jshtml` - HTML Templates in Pure JavaScript
 
-`jshtml` is a lightweight library for writing clean and performant HTML in pure JavaScript. Create HTML elements and
+`jshtml` is a lightweight library for writing clean and performant HTML templates in pure JavaScript. Create HTML elements and
 custom components naturally using JavaScript arrays and functions, then render them to spec-compliant HTML strings or
 serializable JSON. Use `jshtml` in place of HTML templates (like Mustache, Handlebars, EJS, etc.) JSX to construct and generate HTML within
 JavaScript code.
